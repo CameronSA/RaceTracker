@@ -9,9 +9,54 @@ namespace RaceTracker.Models
 {
     public class PlottingModel : INotifyPropertyChanged
     {
-        private Dictionary<string, List<string>> dataFields;
+        private Dictionary<string, string[]> dataFields;
 
-        public Dictionary<string, List<string>> DataFields
+        private List<string> dataHeaders;
+
+        private string xAxisSelection;
+
+        private string yAxisSelection;
+
+        public string XAxisSelection
+        {
+            get
+            {
+                return this.xAxisSelection;
+            }
+            set
+            {
+                this.xAxisSelection = value;
+                this.OnPropertyChanged("XAxisSelection");
+            }
+        }
+
+        public string YAxisSelection
+        {
+            get
+            {
+                return this.yAxisSelection;
+            }
+            set
+            {
+                this.yAxisSelection = value;
+                this.OnPropertyChanged("YAxisSelection");
+            }
+        }
+
+        public List<string> DataHeaders
+        {
+            get
+            {
+                return this.dataHeaders;
+            }
+            set
+            {
+                this.dataHeaders = value;
+                this.OnPropertyChanged("DataHeaders");
+            }
+        }
+
+        public Dictionary<string, string[]> DataFields
         {
             get
             {
