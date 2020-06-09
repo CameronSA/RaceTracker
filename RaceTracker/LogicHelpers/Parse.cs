@@ -10,7 +10,7 @@ namespace RaceTracker.LogicHelpers
     {
         public static Dictionary<string,List<string>> DataFile()
         {
-
+            return null;
         }
     }
 }
