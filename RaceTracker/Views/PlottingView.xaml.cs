@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Windows.Controls;
+using ScottPlot;
 
 namespace RaceTracker.Views
 {
@@ -13,8 +15,8 @@ namespace RaceTracker.Views
     {
         public PlottingView()
         {
-            var viewModel = new PlottingViewModel();
             InitializeComponent();
+            var viewModel = new PlottingViewModel(this);
             this.DataContext = viewModel;
         }
     }

@@ -10,7 +10,13 @@ using System.Windows;
 namespace RaceTracker.LogicHelpers
 {
     public static class Data
-    {        
+    {
+        public static Dictionary<string, string[]> RaceData { get; set; }
+
+        private static Dictionary<string, List<string>> FileData { get; set; }
+
+        private static string[] Headers { get; set; }
+
         public static void ParseFile(string filePath)
         {
             Data.RaceData = new Dictionary<string, string[]>();
@@ -46,6 +52,50 @@ namespace RaceTracker.LogicHelpers
             }
         }
 
+        public static List<string> GetColumnValues(string columnHeader)
+        {
+            var data = new List<string>();
+            if (Data.RaceData.ContainsKey(columnHeader))
+            {
+                foreach (var item in Data.RaceData[columnHeader])
+                {
+                    data.Add(item);
+                }
+            }
+
+            return data;
+        }
+
+        public static double[] ConvertToDoubles(IEnumerable<string> list)
+        {
+            var items = new List<double>();
+
+            try
+            {
+                foreach (var item in list)
+                {
+                    items.Add(double.Parse(item));
+                }
+            }
+            catch
+            {
+                MessageBox.Show("ERROR: Data is not numeric", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return items.ToArray();
+        }
+
+        public static T[] SubArray<T>(T[] array, int startIndex, int length)
+        {
+            var subArray = new T[length];
+            for (int i = startIndex; i < length; i++)
+            {
+                subArray[i] = array[i];
+            }
+
+            return subArray;
+        }
+
         private static void ProcessLine(string line, bool isHeader, string filePath)
         {
             string[] fields = line.Split(AppSettings.Delimiter);
@@ -72,11 +122,5 @@ namespace RaceTracker.LogicHelpers
                 MessageBox.Show("WARNING: Failed to process data file at path '" + filePath + "'. File format invalid", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-
-        public static Dictionary<string,string[]> RaceData { get; set; }
-
-        private static Dictionary<string, List<string>> FileData { get; set; }
-
-        private static string[] Headers { get; set; }
     }
 }

@@ -14,7 +14,6 @@ namespace RaceTracker.Models
         private List<string> dataHeaders;
 
         private string xAxisSelection;
-
         private string yAxisSelection;
 
         public string XAxisSelection
