@@ -96,6 +96,8 @@
     <Compile Include="LogicHelpers\AppSettings.cs" />
     <Compile Include="LogicHelpers\CommandLine.cs" />
     <Compile Include="LogicHelpers\Data.cs" />
+    <Compile Include="LogicHelpers\RaceData.cs" />
+    <Compile Include="LogicHelpers\UnitConversions.cs" />
     <Compile Include="Models\PlottingModel.cs" />
     <Compile Include="ViewModels\PlottingViewModel.cs" />
     <Compile Include="Views\DataView.xaml.cs">

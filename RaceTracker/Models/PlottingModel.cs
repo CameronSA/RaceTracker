@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RaceTracker.LogicHelpers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace RaceTracker.Models
 {
     public class PlottingModel : INotifyPropertyChanged
     {
-        private Dictionary<string, string[]> dataFields;
+        private Dictionary<string, RaceData> dataFields;
 
         private List<string> dataHeaders;
 
@@ -55,7 +56,7 @@ namespace RaceTracker.Models
             }
         }
 
-        public Dictionary<string, string[]> DataFields
+        public Dictionary<string, RaceData> DataFields
         {
             get
             {

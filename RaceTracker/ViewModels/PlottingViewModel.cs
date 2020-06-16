@@ -17,7 +17,7 @@ namespace RaceTracker.ViewModels
         {
             this.Model = new PlottingModel()
             {
-                DataFields = Data.RaceData,
+                DataFields = Data.ProcessedRaceData,
                 DataHeaders = this.PopulateDataHeaders()
             };
 
@@ -34,7 +34,7 @@ namespace RaceTracker.ViewModels
         private List<string> PopulateDataHeaders()
         {
             var headers = new List<string>();
-            foreach(var header in Data.RaceData.Keys)
+            foreach(var header in Data.ProcessedRaceData.Keys)
             {
                 headers.Add(header);
             }

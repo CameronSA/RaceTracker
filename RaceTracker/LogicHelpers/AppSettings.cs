@@ -10,6 +10,13 @@ namespace RaceTracker.LogicHelpers
 {
     public static class AppSettings
     {
+        public static string DataHeaders
+        { 
+            get
+            {
+                return ConfigurationManager.AppSettings["DataHeaders"];
+            }
+        }
         public static char Delimiter
         {
             get
