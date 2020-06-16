@@ -53,54 +53,35 @@ namespace RaceTracker.Commands
 
         private void PlotGeneric()
         {
+            this.ViewModel.View.GenericPlot.Reset();
             string xAxis = this.ViewModel.Model.XAxisSelection;
             string yAxis = this.ViewModel.Model.YAxisSelection;
-            //var x = Data.SubArray(Data.GetColumnValues(xAxis).ToArray(), 0, 20);
-            //var y = Data.SubArray(Data.GetColumnValues(yAxis).ToArray(), 0, 20);
-            var x = Data.GetColumnValues(xAxis).ToArray();
-            var y = Data.GetColumnValues(yAxis).ToArray();
+            var xData = Data.ProcessedRaceData[xAxis];
+            var yData = Data.ProcessedRaceData[yAxis];
+            var x = xData.Data;
+            var y = yData.Data;
 
-            bool xIsNumeric = false;
-            bool yIsNumeric = false;
-
-            foreach (var item in x)
-            {
-                if (!double.TryParse(item, out _))
-                {
-                    xIsNumeric = false;
-                    break;
-                }
-                else
-                {
-                    xIsNumeric = true;
-                }
-            }
-
-            foreach (var item in y)
-            {
-                if (!double.TryParse(item, out _))
-                {
-                    yIsNumeric = false;
-                    break;
-                }
-                else
-                {
-                    yIsNumeric = true;
-                }
-            }
+            bool xIsNumeric = xData.Type == typeof(int) || xData.Type == typeof(double);
+            bool yIsNumeric = yData.Type == typeof(int) || yData.Type == typeof(double);
 
             if (xIsNumeric && yIsNumeric)
             {
-                var xNumeric = Data.ConvertToDoubles(x);
-                var yNumeric = Data.ConvertToDoubles(y);
+                var xNumeric = Data.SubArray(Data.ConvertToDoubles(x), 0, 2000);
+                var yNumeric = Data.SubArray(Data.ConvertToDoubles(y), 0, 2000);
                 this.ViewModel.View.GenericPlot.plt.PlotScatter(xNumeric, yNumeric);
             }
             else if (yIsNumeric)
             {
+                var xString = new List<string>();
+                foreach (var item in x)
+                {
+                    xString.Add(item.ToString());
+                }
+
                 var yNumeric = Data.ConvertToDoubles(y);
                 var barCount = DataGen.Consecutive(x.Length);
                 this.ViewModel.View.GenericPlot.plt.PlotBar(barCount, yNumeric);
-                this.ViewModel.View.GenericPlot.plt.XTicks(barCount, x.ToArray());
+                this.ViewModel.View.GenericPlot.plt.XTicks(barCount, xString.ToArray());
             }
             else
             {

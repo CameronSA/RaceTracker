@@ -58,22 +58,8 @@ namespace RaceTracker.LogicHelpers
                 MessageBox.Show("WARNING: Could not find data file at path '" + filePath + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-
-        public static List<string> GetColumnValues(string columnHeader)
-        {
-            var data = new List<string>();
-            if (Data.RaceData.ContainsKey(columnHeader))
-            {
-                foreach (var item in Data.RaceData[columnHeader])
-                {
-                    data.Add(item);
-                }
-            }
-
-            return data;
-        }
-
-        public static double[] ConvertToDoubles(IEnumerable<string> list)
+        
+        public static double[] ConvertToDoubles(IEnumerable<object> list)
         {
             var items = new List<double>();
 
@@ -81,7 +67,7 @@ namespace RaceTracker.LogicHelpers
             {
                 foreach (var item in list)
                 {
-                    items.Add(double.Parse(item));
+                    items.Add(double.Parse(item.ToString()));
                 }
             }
             catch
