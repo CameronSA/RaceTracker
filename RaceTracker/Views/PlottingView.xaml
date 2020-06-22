@@ -7,26 +7,53 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        
-        <Grid Grid.Row="1" Grid.Column="1">
+        <TabControl>
+            <TabItem Header="Favourites">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Position: " FontSize="14"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.Position, Mode=TwoWay}" Width="100"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Resolution: " FontSize="14"/>
+                        <ComboBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" ItemsSource="{Binding Path=Model.TimeResolutionFields}" SelectedItem="{Binding Path=Model.TimeResolutionField, Mode=TwoWay}" FontSize="14" Width="100"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Min Date" FontSize="14"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Max Date" FontSize="14"/>
+                        <DatePicker Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MinDate, Mode=TwoWay}"/>
+                        <DatePicker Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MaxDate, Mode=TwoWay}"/>
+
+                        <Button Grid.Row="1" Grid.Column="3" Grid.RowSpan="3" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding Path=Command}" CommandParameter="btPositionGo" FontSize="14" Width="60" Height="60"/>
+                    </Grid>                    
+                    <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="FavouritePlot"/>
+                </Grid>              
+            </TabItem>
+        </TabControl>
+        <!--<Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -45,6 +72,6 @@
             <ComboBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" ItemsSource="{Binding Path=Model.DataHeaders}" SelectedItem="{Binding Path=Model.YAxisSelection}"/>
             <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Plot" FontSize="14" Command="{Binding Path=Command}" CommandParameter="btPlotGeneric"/>
         </Grid>
-        <WpfPlot Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2" Name="GenericPlot"/>
+        <WpfPlot Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2" Name="GenericPlot"/>-->
     </Grid>
 </UserControl>

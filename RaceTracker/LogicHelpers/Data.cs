@@ -13,7 +13,7 @@ namespace RaceTracker.LogicHelpers
 {
     public static class Data
     {
-        public static Dictionary<string, RaceData> ProcessedRaceData {get;set;}
+        public static Dictionary<string, RaceData> ProcessedRaceData { get; set; }
 
         private static Dictionary<string, string[]> RaceData { get; set; }
 
@@ -27,7 +27,7 @@ namespace RaceTracker.LogicHelpers
             Data.RaceData = new Dictionary<string, string[]>();
             Data.FileData = new Dictionary<string, List<string>>();
             Data.Headers = new string[0];
-            if(File.Exists(filePath))
+            if (File.Exists(filePath))
             {
                 using (var streamReader = new StreamReader(filePath))
                 {
@@ -39,7 +39,7 @@ namespace RaceTracker.LogicHelpers
                     } while (!streamReader.EndOfStream);
                 }
 
-                foreach(var column in Data.FileData)
+                foreach (var column in Data.FileData)
                 {
                     if (Data.RaceData.ContainsKey(column.Key))
                     {
@@ -58,7 +58,7 @@ namespace RaceTracker.LogicHelpers
                 MessageBox.Show("WARNING: Could not find data file at path '" + filePath + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        
+
         public static double[] ConvertToDoubles(IEnumerable<object> list)
         {
             var items = new List<double>();
@@ -87,6 +87,64 @@ namespace RaceTracker.LogicHelpers
             }
 
             return subArray;
+        }
+
+        public static DateTime GetMinDate()
+        {
+            var minDate = DateTime.Now;
+            try
+            {
+                foreach (var column in Data.ProcessedRaceData)
+                {
+                    if (column.Key.ToLower() == "date")
+                    {
+                        var dateArray = column.Value.Data;
+                        foreach (var date in dateArray)
+                        {
+                            var dateTime = (DateTime)date;
+                            if (dateTime < minDate)
+                            {
+                                minDate = dateTime;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                MessageBox.Show("ERROR: Failed to find earliest date", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return minDate;
+        }
+
+        public static DateTime GetMaxDate()
+        {
+            var maxDate = new DateTime(0001, 1, 1);
+            try
+            { 
+            foreach (var column in Data.ProcessedRaceData)
+            {
+                if (column.Key.ToLower() == "date")
+                {
+                    var dateArray = column.Value.Data;
+                    foreach (var date in dateArray)
+                    {
+                        var dateTime = (DateTime)date;
+                        if (dateTime > maxDate)
+                        {
+                            maxDate = dateTime;
+                        }
+                    }
+                }
+            }
+            }
+            catch
+            {
+                MessageBox.Show("ERROR: Failed to find latest date", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return maxDate;
         }
 
         private static void ProcessRaceData()

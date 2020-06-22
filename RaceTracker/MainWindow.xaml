@@ -14,7 +14,7 @@
             <TabItem Header="Home">
                 <Views:HomeView/>
             </TabItem>
-            <TabItem Header="Plotting">
+            <TabItem Header="Analysis">
                 <Views:PlottingView/>
             </TabItem>
             <TabItem Header="Data">

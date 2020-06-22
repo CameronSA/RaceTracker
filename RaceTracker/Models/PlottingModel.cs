@@ -11,11 +11,79 @@ namespace RaceTracker.Models
     public class PlottingModel : INotifyPropertyChanged
     {
         private Dictionary<string, RaceData> dataFields;
-
         private List<string> dataHeaders;
-
         private string xAxisSelection;
         private string yAxisSelection;
+        private string position;
+        private List<string> timeResolutionFields;
+        private string timeResolutionField;
+        private DateTime minDate;
+        private DateTime maxDate;
+
+        public DateTime MinDate
+        {
+            get
+            {
+                return this.minDate;
+            }
+            set
+            {
+                this.minDate = value;
+                this.OnPropertyChanged("MinDate");
+            }
+        }
+
+        public DateTime MaxDate
+        {
+            get
+            {
+                return this.maxDate;
+            }
+            set
+            {
+                this.maxDate = value;
+                this.OnPropertyChanged("MaxDate");
+            }
+        }
+
+        public string TimeResolutionField
+        {
+            get
+            {
+                return this.timeResolutionField;
+            }
+            set
+            {
+                this.timeResolutionField = value;
+                this.OnPropertyChanged("TimeResolutionField");
+            }
+        }
+        
+        public List<string> TimeResolutionFields
+        {
+            get
+            {
+                return this.timeResolutionFields;
+            }
+            set
+            {
+                this.timeResolutionFields = value;
+                this.OnPropertyChanged("TimeResolutionFields");
+            }
+        }
+
+        public string Position
+        {
+            get
+            {
+                return this.position;
+            }
+            set
+            {
+                this.position = value;
+                this.OnPropertyChanged("Position");
+            }
+        }
 
         public string XAxisSelection
         {

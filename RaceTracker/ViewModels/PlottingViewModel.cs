@@ -18,7 +18,12 @@ namespace RaceTracker.ViewModels
             this.Model = new PlottingModel()
             {
                 DataFields = Data.ProcessedRaceData,
-                DataHeaders = this.PopulateDataHeaders()
+                DataHeaders = this.PopulateDataHeaders(),
+                Position = "1",
+                TimeResolutionFields = new List<string> { TimeResolutionFields.Day, TimeResolutionFields.Month, TimeResolutionFields.Year },
+                TimeResolutionField = TimeResolutionFields.Day,
+                MinDate = Data.GetMinDate(),
+                MaxDate = Data.GetMaxDate(),
             };
 
             if (this.Model.DataHeaders.Count > 0)
