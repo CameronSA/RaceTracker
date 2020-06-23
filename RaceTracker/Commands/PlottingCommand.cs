@@ -85,6 +85,38 @@ namespace RaceTracker.Commands
             }
         }
 
+        private Dictionary<List<DateTime>, List<double>> GetNumberRaceCoursesData(string resolution, DateTime minDate, DateTime maxDate)
+        {
+            var relevantColumns = new List<Tuple<DateTime, string>>();
+            var dates = new List<DateTime>();
+            var raceTracks = new List<string>();
+
+            foreach (var column in Data.ProcessedRaceData)
+            {
+                if (column.Key.ToLower() == "date")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        dates.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower() == "racetrack")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        raceTracks.Add((string)item);
+                    }
+                }
+            }
+
+            for (int i = 0; i < dates.Count; i++)
+            {
+                relevantColumns.Add(new Tuple<DateTime, string>(dates[i], raceTracks[i]));
+            }
+
+            return this.GetNumberOfRaceTracksPerDate(relevantColumns, minDate, maxDate, resolution);
+        }
+
         private Dictionary<List<DateTime>, List<double>> GetFavouriteByPostionData(int position, string resolution, DateTime minDate, DateTime maxDate)
         {
             var relevantColumns = new List<Tuple<DateTime, int, string>>();
@@ -122,7 +154,13 @@ namespace RaceTracker.Commands
                 relevantColumns.Add(new Tuple<DateTime, int, string>(dates[i], postions[i], expectations[i]));
             }
 
-            return this.GetProbabilityOfFavouriteWin(relevantColumns, minDate, maxDate, position, resolution);
+            return this.GetProbabilityOfFavouriteWin(relevantColumns, minDate, maxDate, position, resolution);            
+        }
+
+        private Dictionary<List<DateTime>, List<double>> GetNumberOfRaceTracksPerDate(List<Tuple<DateTime, string>> rows, DateTime minDate, DateTime maxDate, string resolution)
+        {
+            var dates = new List<DateTime>();
+            var tracksPerDate = new List<double>();
 
             
         }
