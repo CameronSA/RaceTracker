@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -54,9 +55,12 @@ namespace RaceTracker.Commands
             }
         }
 
-        private void PlotTimeSeries(IEnumerable<DateTime> x, IEnumerable<double> y)
+        private void PlotTimeSeries(IEnumerable<DateTime> x, IEnumerable<double> y, bool reset)
         {
-            this.ViewModel.View.FavouritePlot.Reset();
+            if (reset)
+            {
+                this.ViewModel.View.FavouritePlot.Reset();
+            }
 
             var xNumeric = new List<double>();
             foreach (var item in x)
@@ -75,13 +79,24 @@ namespace RaceTracker.Commands
                 var positionData = this.GetFavouriteByPostionData(position, this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
                 foreach (var set in positionData)
                 {
-                    this.PlotTimeSeries(set.Key, set.Value);
+                    this.PlotTimeSeries(set.Key, set.Value,true);
                     break;
                 }
             }
             else
             {
                 MessageBox.Show("ERROR: Position must be a positive integer!", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            this.NumberRaceCoursesByDate();
+        }
+
+        private void NumberRaceCoursesByDate()
+        {
+            var raceCoursesData = this.GetNumberRaceCoursesData(this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+            foreach (var set in raceCoursesData)
+            {
+                this.PlotTimeSeries(set.Key, set.Value, false);
             }
         }
 
@@ -161,8 +176,58 @@ namespace RaceTracker.Commands
         {
             var dates = new List<DateTime>();
             var tracksPerDate = new List<double>();
+            var tracksPerDelimiter = new Dictionary<string, HashSet<string>>();
+            foreach (var row in rows)
+            {
+                // Check date is within range
+                if (row.Item1 >= minDate && row.Item1 <= maxDate)
+                {
+                    string delimiter = string.Empty;
+                    switch (resolution)
+                    {
+                        case TimeResolutionFields.Day: delimiter = Formatting.EditStringLength(row.Item1.Year.ToString(), 4) + Formatting.EditStringLength(row.Item1.Month.ToString(), 2) + Formatting.EditStringLength(row.Item1.Day.ToString(), 2); break;
+                        case TimeResolutionFields.Month: delimiter = Formatting.EditStringLength(row.Item1.Year.ToString(), 4) + Formatting.EditStringLength(row.Item1.Month.ToString(), 2); break;
+                        case TimeResolutionFields.Year: delimiter = Formatting.EditStringLength(row.Item1.Year.ToString(), 4); break;
+                        default:
+                            MessageBox.Show("ERROR: Invalid time resolution selected: " + resolution, AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            throw new Exception();
+                    }
 
-            
+                    if (tracksPerDelimiter.ContainsKey(delimiter))
+                    {
+                        tracksPerDelimiter[delimiter].Add(row.Item2.Trim());
+                    }
+                    else
+                    {
+                        tracksPerDelimiter.Add(delimiter, new HashSet<string> { row.Item2.Trim() });
+                    }
+                }
+            }
+
+            // Count the number of unique racetracks per delimiter
+            foreach (var delimiter in tracksPerDelimiter)
+            {
+                string dateFormat = string.Empty;
+                switch (resolution)
+                {
+                    case TimeResolutionFields.Day: dateFormat = "yyyyMMdd"; break;
+                    case TimeResolutionFields.Month: dateFormat = "yyyyMM"; break;
+                    case TimeResolutionFields.Year: dateFormat = "yyyy"; break;
+                    default:
+                        MessageBox.Show("ERROR: Invalid time resolution selected: " + resolution, AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        throw new Exception();
+                }
+
+                dates.Add(DateTime.ParseExact(delimiter.Key, dateFormat, CultureInfo.InvariantCulture));
+                tracksPerDate.Add(delimiter.Value.Count);
+            }
+
+            var result = new Dictionary<List<DateTime>, List<double>>
+            {
+                { dates, tracksPerDate }
+            };
+
+            return result;
         }
 
         private Dictionary<List<DateTime>, List<double>> GetProbabilityOfFavouriteWin(List<Tuple<DateTime, int, string>> rows, DateTime minDate, DateTime maxDate, int position, string resolution)
