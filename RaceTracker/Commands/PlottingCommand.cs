@@ -252,25 +252,28 @@ namespace RaceTracker.Commands
                             throw new Exception();
                     }
 
-                    if (racesPerDelimiter.ContainsKey(delimiter))
-                    {
-                        racesPerDelimiter[delimiter] = racesPerDelimiter[delimiter] += 1;
-                    }
-                    else
-                    {
-                        racesPerDelimiter.Add(delimiter, 1);
-                    }
-
                     // Check that favourite finished in the given position
-                    if (row.Item2 == position && row.Item3.ToLower().Trim() == "f")
+                    if (row.Item2 == position)
                     {
-                        if (raceWinsPerDelimiter.ContainsKey(delimiter))
+                        if (row.Item3.ToLower().Trim() == "f")
                         {
-                            raceWinsPerDelimiter[delimiter] = racesPerDelimiter[delimiter] += 1;
+                            if (raceWinsPerDelimiter.ContainsKey(delimiter))
+                            {
+                                raceWinsPerDelimiter[delimiter] = raceWinsPerDelimiter[delimiter] += 1;
+                            }
+                            else
+                            {
+                                raceWinsPerDelimiter.Add(delimiter, 1);
+                            }
+                        }
+
+                        if (racesPerDelimiter.ContainsKey(delimiter))
+                        {
+                            racesPerDelimiter[delimiter] = racesPerDelimiter[delimiter] += 1;
                         }
                         else
                         {
-                            raceWinsPerDelimiter.Add(delimiter, 1);
+                            racesPerDelimiter.Add(delimiter, 1);
                         }
                     }
                 }
@@ -299,7 +302,7 @@ namespace RaceTracker.Commands
                 }
 
                 dates.Add(DateTime.ParseExact(delimiter.Key, dateFormat, CultureInfo.InvariantCulture));
-                probabilities.Add(numerator / denominator);
+                probabilities.Add(100 * (numerator / denominator));
             }
 
             var result = new Dictionary<List<DateTime>, List<double>>
