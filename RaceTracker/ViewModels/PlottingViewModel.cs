@@ -24,6 +24,8 @@ namespace RaceTracker.ViewModels
                 TimeResolutionField = TimeResolutionFields.Day,
                 MinDate = Data.GetMinDate(),
                 MaxDate = Data.GetMaxDate(),
+                IndividualNumberRacecoursesMin = "1",
+                IndividualNumberRacecoursesMax = "15",
             };
 
             if (this.Model.DataHeaders.Count > 0)

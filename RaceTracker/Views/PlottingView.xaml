@@ -8,7 +8,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TabControl>
-            <TabItem Header="Favourites">
+            <TabItem Header="Favourites By Position ">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -24,54 +24,114 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Grid.Column="0">
+                    <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Position:" FontSize="18"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.Position, Mode=TwoWay}" Width="100"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Resolution:" FontSize="18"/>
+                        <ComboBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" ItemsSource="{Binding Path=Model.TimeResolutionFields}" SelectedItem="{Binding Path=Model.TimeResolutionField, Mode=TwoWay}" FontSize="14" Width="100"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Min Date" FontSize="18"/>
+                        <TextBlock Grid.Row="3" Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Max Date" FontSize="18"/>
+                        <DatePicker Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MinDate, Mode=TwoWay}"/>
+                        <DatePicker Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MaxDate, Mode=TwoWay}"/>
+
+                        <Button Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Path=Command}" CommandParameter="btPositionGo" FontSize="14" Width="100"/>
+                    </Grid>                    
+                    <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="FavouritePlot"/>
+                    <WpfPlot Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Grid.RowSpan="3" Name="FavouriteVsNumberRaceCoursesPlot"/>
+                </Grid>              
+            </TabItem>
+            <TabItem Header=" Daily Race Profile ">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Position:" FontSize="18"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.Position, Mode=TwoWay}" Width="100"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Min Date" FontSize="18"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Max Date" FontSize="18"/>
+                        <DatePicker Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MinDate, Mode=TwoWay}"/>
+                        <DatePicker Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MaxDate, Mode=TwoWay}"/>
+
+                        <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Path=Command}" CommandParameter="btDailyProfileGo" FontSize="14" Width="100"/>
+
+                        <TextBlock Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Text="Filter on lower odds and race type (flat + everything else)"/>
+                    </Grid>
+                    <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="DailyProfilePlot"/>
+                    <WpfPlot Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="DailyProfileVsNumberRaceCoursesOverallPlot"/>
+                    <WpfPlot Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="DailyProfileVsNumberRaceCoursesIndividualPlot"/>
+                    <Grid Grid.Row="3" Grid.Column="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Text="# Racecourses Min-Max: " FontSize="10"/>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Position: " FontSize="14"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.Position, Mode=TwoWay}" Width="100"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Resolution: " FontSize="14"/>
-                        <ComboBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" ItemsSource="{Binding Path=Model.TimeResolutionFields}" SelectedItem="{Binding Path=Model.TimeResolutionField, Mode=TwoWay}" FontSize="14" Width="100"/>
-                        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Min Date" FontSize="14"/>
-                        <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Max Date" FontSize="14"/>
-                        <DatePicker Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MinDate, Mode=TwoWay}"/>
-                        <DatePicker Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MaxDate, Mode=TwoWay}"/>
-
-                        <Button Grid.Row="1" Grid.Column="3" Grid.RowSpan="3" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Left" Command="{Binding Path=Command}" CommandParameter="btPositionGo" FontSize="14" Width="60" Height="60"/>
-                    </Grid>                    
-                    <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="FavouritePlot"/>
-                </Grid>              
+                        <Grid Grid.Row="0" Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="5*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.IndividualNumberRacecoursesMin, Mode=TwoWay}" Width="30"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="-" FontSize="10"/>
+                            <TextBox Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.IndividualNumberRacecoursesMax, Mode=TwoWay}" Width="30"/>
+                        </Grid>
+                        
+                        <CheckBox Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reset" FontSize="10" IsChecked="{Binding Path=Model.ResetIndividual, Mode=TwoWay}"/>
+                    </Grid>
+                </Grid>
             </TabItem>
         </TabControl>
-        <!--<Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Generic Plot:" FontSize="20"/>
-            <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="X Axis:" FontSize="18"/>
-            <TextBlock Grid.Column="0" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Y Axis:" FontSize="18"/>
-            <ComboBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" ItemsSource="{Binding Path=Model.DataHeaders}" SelectedItem="{Binding Path=Model.XAxisSelection}"/>
-            <ComboBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" ItemsSource="{Binding Path=Model.DataHeaders}" SelectedItem="{Binding Path=Model.YAxisSelection}"/>
-            <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Plot" FontSize="14" Command="{Binding Path=Command}" CommandParameter="btPlotGeneric"/>
-        </Grid>
-        <WpfPlot Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2" Name="GenericPlot"/>-->
+        
     </Grid>
 </UserControl>

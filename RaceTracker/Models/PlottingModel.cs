@@ -19,6 +19,48 @@ namespace RaceTracker.Models
         private string timeResolutionField;
         private DateTime minDate;
         private DateTime maxDate;
+        private string individualNumberRacecoursesMin;
+        private string individualNumberRacecoursesMax;
+        private bool resetIndividual;
+
+        public bool ResetIndividual
+        { 
+            get
+            {
+                return this.resetIndividual;
+            }
+            set
+            {
+                this.resetIndividual = value;
+                this.OnPropertyChanged("ResetIndividual");
+            }
+        }
+
+        public string IndividualNumberRacecoursesMin
+        {
+            get
+            {
+                return this.individualNumberRacecoursesMin;
+            }
+            set
+            {
+                this.individualNumberRacecoursesMin = value;
+                this.OnPropertyChanged("IndividualNumberRacecoursesMin");
+            }
+        }
+
+        public string IndividualNumberRacecoursesMax
+        {
+            get
+            {
+                return this.individualNumberRacecoursesMax;
+            }
+            set
+            {
+                this.individualNumberRacecoursesMax = value;
+                this.OnPropertyChanged("IndividualNumberRacecoursesMax");
+            }
+        }
 
         public DateTime MinDate
         {
