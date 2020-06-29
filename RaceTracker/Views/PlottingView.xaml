@@ -98,7 +98,7 @@
 
                         <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Path=Command}" CommandParameter="btDailyProfileGo" FontSize="14" Width="100"/>
 
-                        <TextBlock Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Text="Filter on lower odds and race type (flat + everything else)"/>
+                        <TextBlock Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Text="Filter on lower odds and race type (flat + everything else). Make poisson plot with position instead of number racecourses. Add option for top 3 as well as particular position"/>
                     </Grid>
                     <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="DailyProfilePlot"/>
                     <WpfPlot Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="DailyProfileVsNumberRaceCoursesOverallPlot"/>
