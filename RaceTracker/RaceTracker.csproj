@@ -103,6 +103,7 @@
     <Compile Include="LogicHelpers\Formatting.cs" />
     <Compile Include="LogicHelpers\RaceData.cs" />
     <Compile Include="LogicHelpers\UnitConversions.cs" />
+    <Compile Include="Models\NormalisingFactors.cs" />
     <Compile Include="Models\PlottingModel.cs" />
     <Compile Include="Models\TimeResolutionFields.cs" />
     <Compile Include="ViewModels\PlottingViewModel.cs" />

@@ -68,7 +68,7 @@ namespace RaceTracker.Analysis
             var numberRacesBeforeFavouriteWinVsCount = new Dictionary<double, double>();
             var raceProfile = new List<double>();
             var raceProfileCount = new List<double>();
-            int daysWithNumberOfRaceCourses = this.CalculateNumberOfDaysWithGivenNumberOfRaceCourses(numberRaceCourses);
+            int daysWithNumberOfRaceCourses = CommonAnalyses.CalculateNumberOfDaysWithGivenNumberOfRaceCourses(numberRaceCourses, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
 
             foreach (var dataSet in this.OverallRaceProfileDataVsNumberRaceCourses)
             {
@@ -103,25 +103,6 @@ namespace RaceTracker.Analysis
             string seriesName = "Position " + this.ViewModel.Model.Position + ": Number of Courses = " + numberRaceCourses;
 
             this.Plotting.PlotScatter(this.ViewModel.View.DailyProfileVsNumberRaceCoursesIndividualPlot, raceProfile, raceProfileCount, reset, "Number of Races Before Favourite Finishes in Position" + this.ViewModel.Model.Position, "Count/# Days", this.individualPlotSeries, seriesName, -1, 45, -0.02, 0.51);
-        }
-
-        private int CalculateNumberOfDaysWithGivenNumberOfRaceCourses(int numberRaceCourses)
-        {
-            var data = CommonAnalyses.GetNumberRaceCoursesData(TimeResolutionFields.Day, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
-            var days = new HashSet<DateTime>();
-
-            foreach (var dataSet in data)
-            {
-                for (int i = 0; i < dataSet.Key.Count; i++)
-                {
-                    if (dataSet.Value[i] == numberRaceCourses)
-                    {
-                        days.Add(dataSet.Key[i]);
-                    }
-                }
-            }
-
-            return days.Count;
         }
 
         private void DailyRaceProfileVsNumberRaceCourses()
@@ -180,7 +161,7 @@ namespace RaceTracker.Analysis
                 break;
             }
 
-            this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position, "Number of Race Courses Running");
+            this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position, "Number of Race Courses Running", NormalisingFactors.NumberOfRaceTracks, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
         }
 
         private void NumberRaceCoursesByDate()

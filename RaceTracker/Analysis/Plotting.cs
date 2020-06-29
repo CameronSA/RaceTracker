@@ -1,4 +1,5 @@
-﻿using ScottPlot;
+﻿using RaceTracker.Models;
+using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -61,19 +62,17 @@ namespace RaceTracker.Analysis
             plot.plt.PlotScatter(x.ToArray(), y.ToArray(), lineWidth: 0, label: seriesName);
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
-            plot.plt.Axis(xLower, xUpper, yLower, yUpper);
-            //plot.plt.AxisAutoY();
-            
+            plot.plt.Axis(xLower, xUpper, yLower, yUpper);            
             plot.plt.Legend(location: legendLocation.upperRight);
             plot.Render();
         }
 
-        public void PlotScatterLabels(WpfPlot plot, IEnumerable<double> x, IEnumerable<double> y, string xLabel, string yLabel)
+        public void PlotScatterLabels(WpfPlot plot, IEnumerable<double> x, IEnumerable<double> y, string xLabel, string yLabel, string normalisingFactor, DateTime minDate, DateTime maxDate)
         {
             plot.Reset();
             var xVals = x.ToArray();
             var yVals = y.ToArray();
-            var densities = new List<int>();
+            var densities = new List<double>();
             if (xVals.Length < 1 || yVals.Length < 1)
             {
                 return;
@@ -87,16 +86,25 @@ namespace RaceTracker.Analysis
 
             foreach (var coordinate in coordinates)
             {
-                int numberOccurances = 0;
+                double normalisedNumberOccurances = 0;
+                double numberRaceTracks = 0;
                 foreach (var coord in coordinates)
                 {
                     if (coord.Item1 == coordinate.Item1 && coord.Item2 == coordinate.Item2)
                     {
-                        numberOccurances++;
+                        normalisedNumberOccurances++;
+                        numberRaceTracks = coordinate.Item2;
                     }
                 }
 
-                densities.Add(numberOccurances);
+                switch (normalisingFactor)
+                {
+                    case NormalisingFactors.NumberOfRaceTracks:
+                        normalisedNumberOccurances /= (double)CommonAnalyses.CalculateNumberOfDaysWithGivenNumberOfRaceCourses((int)numberRaceTracks, minDate, maxDate);
+                        break;
+                }
+
+                densities.Add(normalisedNumberOccurances);
             }
 
 
@@ -104,7 +112,7 @@ namespace RaceTracker.Analysis
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
 
-            var plottableTextPoints = new Dictionary<string, int>();
+            var plottableTextPoints = new Dictionary<string, double>();
             for (int i = 0; i < coordinates.Count; i++)
             {
                 var key = coordinates[i].Item1 + "," + coordinates[i].Item2;
@@ -123,12 +131,12 @@ namespace RaceTracker.Analysis
             }
 
             var colorThresholds = new double[5];            
-            int maxValue = int.MinValue;
+            float maxValue = float.MinValue;
             foreach (var value in plottableTextPoints.Values)
             {
                 if (value >= maxValue)
                 {
-                    maxValue = value;
+                    maxValue = (float)value;
                 }
             }
 
@@ -170,9 +178,16 @@ namespace RaceTracker.Analysis
                     color = Color.Blue;
                 }
 
-                plot.plt.PlotText(point.Value.ToString(), double.Parse(coords[0]), double.Parse(coords[1]), color: color, fontSize: 16, bold: true);
+                string displayValue = point.Value.ToString();
+                if (displayValue.Length > 3)
+                {
+                    displayValue = displayValue.Substring(0, 3);
+                }
+
+                plot.plt.PlotText(displayValue, double.Parse(coords[0]), double.Parse(coords[1]), color: color, fontSize: 16, bold: true);
             }
 
+            plot.plt.AxisAuto();
             plot.Render();
         }
     }

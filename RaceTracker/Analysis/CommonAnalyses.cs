@@ -98,5 +98,24 @@ namespace RaceTracker.Analysis
 
             return result;
         }
+
+        public static int CalculateNumberOfDaysWithGivenNumberOfRaceCourses(int numberRaceCourses, DateTime minDate, DateTime maxDate)
+        {
+            var data = CommonAnalyses.GetNumberRaceCoursesData(TimeResolutionFields.Day, minDate, maxDate);
+            var days = new HashSet<DateTime>();
+
+            foreach (var dataSet in data)
+            {
+                for (int i = 0; i < dataSet.Key.Count; i++)
+                {
+                    if (dataSet.Value[i] == numberRaceCourses)
+                    {
+                        days.Add(dataSet.Key[i]);
+                    }
+                }
+            }
+
+            return days.Count;
+        }
     }
 }
