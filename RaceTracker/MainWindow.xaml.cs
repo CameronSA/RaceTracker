@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using RaceTracker.Analysis;
 using RaceTracker.LogicHelpers;
 using RaceTracker.Views;
 using System;
@@ -7,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,7 +29,7 @@ namespace RaceTracker
     {
         public MainWindow()
         {
-            this.LoadData();
+            this.ShowLoadingWindow();
             InitializeComponent();
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             this.WindowState = WindowState.Maximized;
@@ -35,11 +37,30 @@ namespace RaceTracker
             this.Width = SystemParameters.PrimaryScreenWidth*0.9;
         }
 
-        private void LoadData()
+        private void ShowLoadingWindow()
+        {
+            var loadingWindow = new LoadingWindow();
+            Task loadData = this.LoadData(loadingWindow);
+            try
+            {
+                loadingWindow.ShowDialog();
+            }
+            catch
+            {
+                MessageBox.Show("WARNING: Error in loading data", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+            loadData.Wait();
+        }
+
+        private async Task LoadData(LoadingWindow window)
         {
             string consoleCommand = "/C " + AppSettings.DataMiningApp + " -copydata " + AppSettings.DataFileName + " " + AppSettings.DataFilePath;
             CommandLine.ExecuteCommand(consoleCommand);
             Data.ParseFile(AppSettings.DataFilePath);
+            CommonAnalyses.LoadInitialData();
+            await Task.Delay(100);
+            window.Close();
         }
     }
 }

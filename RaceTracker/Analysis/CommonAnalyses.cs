@@ -3,13 +3,139 @@ using RaceTracker.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RaceTracker.Analysis
 {
     public static class CommonAnalyses
     {
-        public static Dictionary<List<DateTime>, List<double>> GetNumberRaceCoursesData(string resolution, DateTime minDate, DateTime maxDate)
+        public static Dictionary<List<DateTime>, List<double>> NumberRaceCoursesData { get; private set; } = new Dictionary<List<DateTime>, List<double>>();
+
+        public static Dictionary<int, int> NumberOfDaysWithGivenNumberOfRaceCourses { get; private set; } = new Dictionary<int, int>(); //Key: number race courses. Value: days
+
+        private static DateTime NumberRaceCoursesMin { get; set; }
+        private static DateTime NumberRaceCoursesMax { get; set; }
+        private static DateTime NumberDaysMin { get; set; }
+        private static DateTime NumberDaysMax { get; set; }
+
+        private static string Resolution { get; set; }
+
+        public static void LoadInitialData()
+        {
+            NumberRaceCoursesData = new Dictionary<List<DateTime>, List<double>>();
+            NumberOfDaysWithGivenNumberOfRaceCourses = new Dictionary<int, int>();
+            Resolution = TimeResolutionFields.Day;
+            if (AppSettings.UseFullDataSet)
+            {
+                NumberRaceCoursesMin = Data.GetMinDate();
+                NumberRaceCoursesMax = Data.GetMaxDate();
+                NumberDaysMin = Data.GetMinDate();
+                NumberDaysMax = Data.GetMaxDate();
+            }
+            else
+            {
+                NumberRaceCoursesMin = AppSettings.MinDate;
+                NumberRaceCoursesMax = AppSettings.MaxDate;
+                NumberDaysMin = AppSettings.MinDate;
+                NumberDaysMax = AppSettings.MaxDate;
+            }
+
+            CommonAnalyses.NumberRaceCoursesData = CommonAnalyses.GetNumberRaceCoursesData(Resolution, NumberRaceCoursesMin, NumberRaceCoursesMax);
+
+            for (int i = 1; i <= AppSettings.MaxNumberRaceCourses; i++)
+            {
+                var result = CommonAnalyses.CalculateNumberOfDaysWithGivenNumberOfRaceCourses(i, NumberDaysMin, NumberDaysMax);
+                if (CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses.ContainsKey(i))
+                {
+                    CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses[i] = result;
+                }
+                else
+                {
+                    CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses.Add(i, result);
+                }
+            }
+        }
+
+        public static Dictionary<List<DateTime>, List<double>> RetrieveNumberRaceCoursesData(string resolution, DateTime minDate, DateTime maxDate)
+        {
+            if (resolution == Resolution)
+            {
+                if (minDate.Year == NumberRaceCoursesMin.Year && minDate.Month == NumberRaceCoursesMin.Month && minDate.Day == NumberRaceCoursesMin.Day && maxDate.Year == NumberRaceCoursesMax.Year && maxDate.Month == NumberRaceCoursesMax.Month && maxDate.Day == NumberRaceCoursesMax.Day)
+                {
+                    return NumberRaceCoursesData;
+                }
+                else
+                {
+                    var dates = new List<DateTime>();
+                    var numberCourses = new List<double>();
+                    NumberRaceCoursesMin = minDate;
+                    NumberRaceCoursesMax = maxDate;
+                    foreach (var dataSet in NumberRaceCoursesData)
+                    {
+                        var indices = new List<int>();
+                        for (int i = 0; i < dataSet.Key.Count; i++)
+                        {
+                            if (dataSet.Key[i] >= minDate && dataSet.Key[i] <= maxDate)
+                            {
+                                indices.Add(i);
+                            }
+                        }
+
+                        foreach (var index in indices)
+                        {
+                            dates.Add(dataSet.Key[index]);
+                            numberCourses.Add(dataSet.Value[index]);
+                        }
+                    }
+
+                    return new Dictionary<List<DateTime>, List<double>> { { dates, numberCourses } };
+                }
+            }
+            else
+            {
+                Resolution = resolution;
+                return CommonAnalyses.GetNumberRaceCoursesData(resolution, minDate, maxDate);
+            }
+        }
+
+        public static int RetrieveNumberOfDaysWithGivenNumberOfRaceCourses(int numberRaceCourses, DateTime minDate, DateTime maxDate)
+        {
+            if (minDate.Year == NumberDaysMin.Year && minDate.Month == NumberDaysMin.Month && minDate.Day == NumberDaysMin.Day && maxDate.Year == NumberDaysMax.Year && maxDate.Month == NumberDaysMax.Month && maxDate.Day == NumberDaysMax.Day)
+            {
+                if(NumberOfDaysWithGivenNumberOfRaceCourses.ContainsKey(numberRaceCourses))
+                {
+                    return NumberOfDaysWithGivenNumberOfRaceCourses[numberRaceCourses];
+                }
+                else
+                {
+                    int result = CalculateNumberOfDaysWithGivenNumberOfRaceCourses(numberRaceCourses, minDate, maxDate);
+                    NumberOfDaysWithGivenNumberOfRaceCourses.Add(numberRaceCourses, result);
+                    return result;
+                }
+            }
+            else
+            {
+                NumberDaysMin = minDate;
+                NumberDaysMax = maxDate;
+                for (int i = 1; i <= AppSettings.MaxNumberRaceCourses; i++)
+                {
+                    var result = CommonAnalyses.CalculateNumberOfDaysWithGivenNumberOfRaceCourses(i, NumberDaysMin, NumberDaysMax);
+                    if (CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses.ContainsKey(i))
+                    {
+                        CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses[i] = result;
+                    }
+                    else
+                    {
+                        CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses.Add(i, result);
+                    }
+                }
+
+                return RetrieveNumberOfDaysWithGivenNumberOfRaceCourses(numberRaceCourses, minDate, maxDate);
+            }
+        }
+
+        private static Dictionary<List<DateTime>, List<double>> GetNumberRaceCoursesData(string resolution, DateTime minDate, DateTime maxDate)
         {
             var relevantColumns = new List<Tuple<DateTime, string>>();
             var dates = new List<DateTime>();
@@ -39,6 +165,25 @@ namespace RaceTracker.Analysis
             }
 
             return GetNumberOfRaceTracksPerDate(relevantColumns, minDate, maxDate, resolution);
+        }
+
+        private static int CalculateNumberOfDaysWithGivenNumberOfRaceCourses(int numberRaceCourses, DateTime minDate, DateTime maxDate)
+        {
+            var data = CommonAnalyses.NumberRaceCoursesData;
+            var days = new HashSet<DateTime>();
+
+            foreach (var dataSet in data)
+            {
+                for (int i = 0; i < dataSet.Key.Count; i++)
+                {
+                    if (dataSet.Value[i] == numberRaceCourses)
+                    {
+                        days.Add(dataSet.Key[i]);
+                    }
+                }
+            }
+
+            return days.Count;
         }
 
         private static Dictionary<List<DateTime>, List<double>> GetNumberOfRaceTracksPerDate(List<Tuple<DateTime, string>> rows, DateTime minDate, DateTime maxDate, string resolution)
@@ -97,25 +242,6 @@ namespace RaceTracker.Analysis
             };
 
             return result;
-        }
-
-        public static int CalculateNumberOfDaysWithGivenNumberOfRaceCourses(int numberRaceCourses, DateTime minDate, DateTime maxDate)
-        {
-            var data = CommonAnalyses.GetNumberRaceCoursesData(TimeResolutionFields.Day, minDate, maxDate);
-            var days = new HashSet<DateTime>();
-
-            foreach (var dataSet in data)
-            {
-                for (int i = 0; i < dataSet.Key.Count; i++)
-                {
-                    if (dataSet.Value[i] == numberRaceCourses)
-                    {
-                        days.Add(dataSet.Key[i]);
-                    }
-                }
-            }
-
-            return days.Count;
         }
     }
 }

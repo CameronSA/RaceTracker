@@ -104,7 +104,7 @@ namespace RaceTracker.Analysis
 
         private void NumberRaceCoursesByDate()
         {
-            this.NumberRaceCoursesData = CommonAnalyses.GetNumberRaceCoursesData(this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+            this.NumberRaceCoursesData = CommonAnalyses.RetrieveNumberRaceCoursesData(this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
             foreach (var set in NumberRaceCoursesData)
             {
                 this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, false, string.Empty, string.Empty, "Number of Race Courses Running");

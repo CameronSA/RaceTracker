@@ -68,7 +68,7 @@ namespace RaceTracker.Analysis
             var numberRacesBeforeFavouriteWinVsCount = new Dictionary<double, double>();
             var raceProfile = new List<double>();
             var raceProfileCount = new List<double>();
-            int daysWithNumberOfRaceCourses = CommonAnalyses.CalculateNumberOfDaysWithGivenNumberOfRaceCourses(numberRaceCourses, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+            int daysWithNumberOfRaceCourses = CommonAnalyses.RetrieveNumberOfDaysWithGivenNumberOfRaceCourses(numberRaceCourses, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
 
             foreach (var dataSet in this.OverallRaceProfileDataVsNumberRaceCourses)
             {
@@ -166,7 +166,7 @@ namespace RaceTracker.Analysis
 
         private void NumberRaceCoursesByDate()
         {
-            this.NumberRaceCoursesData = CommonAnalyses.GetNumberRaceCoursesData(TimeResolutionFields.Day, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+            this.NumberRaceCoursesData = CommonAnalyses.RetrieveNumberRaceCoursesData(TimeResolutionFields.Day, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
             foreach (var set in NumberRaceCoursesData)
             {
                 this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, false, string.Empty, string.Empty, "Number of Race Courses Running");

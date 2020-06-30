@@ -100,7 +100,7 @@ namespace RaceTracker.Analysis
                 switch (normalisingFactor)
                 {
                     case NormalisingFactors.NumberOfRaceTracks:
-                        normalisedNumberOccurances /= (double)CommonAnalyses.CalculateNumberOfDaysWithGivenNumberOfRaceCourses((int)numberRaceTracks, minDate, maxDate);
+                        normalisedNumberOccurances /= (double)CommonAnalyses.RetrieveNumberOfDaysWithGivenNumberOfRaceCourses((int)numberRaceTracks, minDate, maxDate);
                         break;
                 }
 
