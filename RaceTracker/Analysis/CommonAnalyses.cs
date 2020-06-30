@@ -3,6 +3,7 @@ using RaceTracker.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -89,13 +90,15 @@ namespace RaceTracker.Analysis
                         }
                     }
 
-                    return new Dictionary<List<DateTime>, List<double>> { { dates, numberCourses } };
+                    NumberRaceCoursesData = new Dictionary<List<DateTime>, List<double>> { { dates, numberCourses } };
+                    return NumberRaceCoursesData;
                 }
             }
             else
             {
                 Resolution = resolution;
-                return CommonAnalyses.GetNumberRaceCoursesData(resolution, minDate, maxDate);
+                NumberRaceCoursesData = CommonAnalyses.GetNumberRaceCoursesData(resolution, minDate, maxDate);
+                return NumberRaceCoursesData;
             }
         }
 

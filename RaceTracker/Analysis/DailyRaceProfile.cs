@@ -134,11 +134,6 @@ namespace RaceTracker.Analysis
                 break;
             }
 
-            this.OverallRaceProfileDataVsNumberRaceCourses = new Dictionary<List<double>, List<double>>
-            {
-                { numberRaceTracks, numberRacesBeforeFavouriteWin }
-            };
-
             foreach (var dataSet in this.NumberRaceCoursesData)
             {
                 for (int i = 0; i < dataSet.Key.Count; i++)
@@ -161,6 +156,13 @@ namespace RaceTracker.Analysis
                 break;
             }
 
+            this.OverallRaceProfileDataVsNumberRaceCourses = new Dictionary<List<double>, List<double>>
+            {
+                { numberRaceTracks, numberRacesBeforeFavouriteWin }
+            };
+
+
+            MessageBox.Show(numberRacesBeforeFavouriteWin.Count + " " + numberRaceTracks.Count);
             this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position, "Number of Race Courses Running", NormalisingFactors.NumberOfRaceTracks, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
         }
 
