@@ -129,7 +129,7 @@ namespace RaceTracker.Analysis
 
             var numberRaceTypes = CommonAnalyses.GetNumberRaceTypes(minDate, maxDate);
             var raceTypeNumbers = new Dictionary<string, double>();
-            foreach(var set in numberRaceTypes)
+            foreach (var set in numberRaceTypes)
             {
                 for (int i = 0; i < set.Key.Count; i++)
                 {
@@ -151,11 +151,11 @@ namespace RaceTracker.Analysis
                 raceTypes.Add(row.Key);
                 if (raceTypeNumbers.ContainsKey(row.Key))
                 {
-                    favouriteCount.Add(row.Value / raceTypeNumbers[row.Key]);
+                    favouriteCount.Add(100 * (row.Value / raceTypeNumbers[row.Key]));
                 }
                 else
                 {
-                    favouriteCount.Add(row.Value);
+                    favouriteCount.Add(100 * row.Value);
                     MessageBox.Show("WARNING: Unrecognised race type '" + row.Key + "'", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }

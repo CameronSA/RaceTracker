@@ -4,9 +4,6 @@ using RaceTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RaceTracker.Analysis
@@ -26,7 +23,7 @@ namespace RaceTracker.Analysis
         private List<string> individualPlotSeries { get; set; }
         private Dictionary<List<DateTime>, List<double>> NumberRaceCoursesData { get; set; }
         private Dictionary<List<DateTime>, List<double>> DailyRaceProfileData { get; set; }
-        private Dictionary<List<double>,List<double>> OverallRaceProfileDataVsNumberRaceCourses { get; set; } // Key: Number racecourses. Value: Race profile
+        private Dictionary<List<double>, List<double>> OverallRaceProfileDataVsNumberRaceCourses { get; set; } // Key: Number racecourses. Value: Race profile
         private PlottingViewModel ViewModel { get; }
         private Plotting Plotting { get; }
 
@@ -34,10 +31,20 @@ namespace RaceTracker.Analysis
         {
             if (int.TryParse(this.ViewModel.Model.Position, out int position) && position > 0)
             {
-                this.DailyRaceProfileData = this.GetDailyRaceProfileData(position, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+                this.DailyRaceProfileData = this.GetDailyRaceProfileData(position, this.ViewModel.Model.UpToAndIncludingPosition, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
                 foreach (var set in DailyRaceProfileData)
                 {
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Number of Races Before Favourite Finishes In Position " + this.ViewModel.Model.Position);
+                    string ylabel;
+                    if (this.ViewModel.Model.UpToAndIncludingPosition)
+                    {
+                        ylabel = "Number of Races Before Favourite Finishes In Position " + this.ViewModel.Model.Position + " or Less";
+                    }
+                    else
+                    {
+                        ylabel = "Number of Races Before Favourite Finishes In Position " + this.ViewModel.Model.Position;
+                    }
+
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, ylabel);
                     break;
                 }
 
@@ -54,7 +61,7 @@ namespace RaceTracker.Analysis
 
                     this.ViewModel.Model.ResetIndividual = reset;
                 }
-                else if(!string.IsNullOrEmpty(this.ViewModel.Model.IndividualNumberRacecoursesMin) || !string.IsNullOrEmpty(this.ViewModel.Model.IndividualNumberRacecoursesMin))
+                else if (!string.IsNullOrEmpty(this.ViewModel.Model.IndividualNumberRacecoursesMin) || !string.IsNullOrEmpty(this.ViewModel.Model.IndividualNumberRacecoursesMin))
                 {
                     MessageBox.Show("ERROR: Min-Max values must consist of positive integers!", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -103,9 +110,21 @@ namespace RaceTracker.Analysis
                 this.ViewModel.Model.ResetIndividual = false;
             }
 
-            string seriesName = "Position " + this.ViewModel.Model.Position + ": Number of Courses = " + numberRaceCourses;
+            string seriesName;
+            string ylabel;
 
-            this.Plotting.PlotScatter(this.ViewModel.View.DailyProfileVsNumberRaceCoursesIndividualPlot, raceProfile, raceProfileCount, reset, "Number of Races Before Favourite Finishes in Position" + this.ViewModel.Model.Position, "Count/# Days", this.individualPlotSeries, seriesName, -1, 45, -0.02, 0.8);
+            if (this.ViewModel.Model.UpToAndIncludingPosition)
+            {
+                seriesName = "Position Up To and Including " + this.ViewModel.Model.Position + ": Number of Courses = " + numberRaceCourses;
+                ylabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position + " or Less";
+            }
+            else
+            {
+                seriesName = "Position " + this.ViewModel.Model.Position + ": Number of Courses = " + numberRaceCourses;
+                ylabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position;
+            }
+
+            this.Plotting.PlotScatter(this.ViewModel.View.DailyProfileVsNumberRaceCoursesIndividualPlot, raceProfile, raceProfileCount, reset, ylabel, "Count/# Days", this.individualPlotSeries, seriesName, -1, 45, -0.02, 0.8);
         }
 
         private void DailyRaceProfileVsNumberRaceCourses()
@@ -164,7 +183,17 @@ namespace RaceTracker.Analysis
                 { numberRaceTracks, numberRacesBeforeFavouriteWin }
             };
 
-            this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position, "Number of Race Courses Running Per Day", NormalisingFactors.NumberOfRaceTracks, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+            string xLabel;
+            if (this.ViewModel.Model.UpToAndIncludingPosition)
+            {
+                xLabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position;
+            }
+            else
+            {
+                xLabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position + " or Less";
+            }
+
+            this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, xLabel, "Number of Race Courses Running Per Day", NormalisingFactors.NumberOfRaceTracks, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
         }
 
         private void NumberRaceCoursesByDate()
@@ -176,7 +205,7 @@ namespace RaceTracker.Analysis
             }
         }
 
-        private Dictionary<List<DateTime>, List<double>> GetDailyRaceProfileData(int position, DateTime minDate, DateTime maxDate)
+        private Dictionary<List<DateTime>, List<double>> GetDailyRaceProfileData(int position, bool upToAndIncludingPosition, DateTime minDate, DateTime maxDate)
         {
             var relevantColumns = new List<Tuple<DateTime, DateTime, int, string>>();
             var dates = new List<DateTime>();
@@ -220,25 +249,21 @@ namespace RaceTracker.Analysis
                 relevantColumns.Add(new Tuple<DateTime, DateTime, int, string>(dates[i], times[i], positions[i], expectations[i]));
             }
 
-            return this.GetNumberOfRacesWithoutFavouriteWin(relevantColumns, minDate, maxDate, position);
+            return this.GetNumberOfRacesWithoutFavouriteWin(relevantColumns, minDate, maxDate, position, upToAndIncludingPosition);
         }
 
-        private Dictionary<List<DateTime>, List<double>> GetNumberOfRacesWithoutFavouriteWin(List<Tuple<DateTime, DateTime, int, string>> rows, DateTime minDate, DateTime maxDate, int position)
+        private Dictionary<List<DateTime>, List<double>> GetNumberOfRacesWithoutFavouriteWin(List<Tuple<DateTime, DateTime, int, string>> rows, DateTime minDate, DateTime maxDate, int position, bool upToAndIncludingPosition)
         {
             // Race dates within given date range (x axis)
             var dates = new List<DateTime>();
             // Number of races without the favourite finishing in the given position (y axis)
             var numberRacesWithoutWin = new List<double>();
-
             // Key: day of race. Value: list of race times for that day
             var dailyRaceTimesDictionary = new Dictionary<DateTime, List<DateTime>>();
-
             // Key: Race day. Value: ordered race times for that day with a boolean determining whether the favourite finished in the given position
             var raceOutcomes = new Dictionary<DateTime, List<Tuple<DateTime, bool>>>();
-
             // Unique race days
             var raceDays = new HashSet<DateTime>();
-
             // Find race days within given range
             foreach (var row in rows)
             {
@@ -258,7 +283,7 @@ namespace RaceTracker.Analysis
                 foreach (var row in rows)
                 {
                     // If the favourite came in the given position for that race, add it to a dictionary (This should take into account draws by only overwriting a value if said value is true)
-                    if (row.Item1 == day && row.Item3 == position)
+                    if (row.Item1 == day && (row.Item3 == position || (row.Item3 <= position && upToAndIncludingPosition)))
                     {
                         bool favourite = false;
                         if (row.Item4.ToLower().Trim() == "f")

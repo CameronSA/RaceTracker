@@ -1,9 +1,11 @@
-﻿using RaceTracker.Models;
+﻿using RaceTracker.LogicHelpers;
+using RaceTracker.Models;
 using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace RaceTracker.Analysis
 {
@@ -25,7 +27,13 @@ namespace RaceTracker.Analysis
             {
                 return;
             }
-            
+
+            if (x.ToArray().Length != y.ToArray().Length)
+            {
+                MessageBox.Show("ERROR: x and y data have different lengths (" + x.ToArray().Length + " and " + y.ToArray().Length + ")", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             if (reset)
             {
                 plot.Reset();
@@ -61,6 +69,12 @@ namespace RaceTracker.Analysis
                 return;
             }
 
+            if(x.ToArray().Length != y.ToArray().Length)
+            {
+                MessageBox.Show("ERROR: x and y data have different lengths (" + x.ToArray().Length + " and " + y.ToArray().Length + ")", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             if (reset)
             {
                 plot.Reset();
@@ -91,6 +105,12 @@ namespace RaceTracker.Analysis
             var densities = new List<double>();
             if (xVals.Length < 1 || yVals.Length < 1)
             {
+                return;
+            }
+
+            if (xVals.Length != yVals.Length)
+            {
+                MessageBox.Show("ERROR: x and y data have different lengths (" + xVals.Length + " and " + yVals.Length + ")", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -211,6 +231,12 @@ namespace RaceTracker.Analysis
         {
             if (x.ToArray().Length < 1 || y.ToArray().Length < 1)
             {
+                return;
+            }
+
+            if (x.ToArray().Length != y.ToArray().Length)
+            {
+                MessageBox.Show("ERROR: x and y data have different lengths (" + x.ToArray().Length + " and " + y.ToArray().Length + ")", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
