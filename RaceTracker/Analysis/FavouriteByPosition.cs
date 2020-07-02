@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
 
 namespace RaceTracker.Analysis
@@ -34,17 +35,132 @@ namespace RaceTracker.Analysis
                 this.PositionProbabilityData = this.GetFavouriteByPostionData(position, this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
                 foreach (var set in this.PositionProbabilityData)
                 {
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot,set.Key, set.Value, true, string.Empty, string.Empty, "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)");
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)");
                     break;
                 }
 
                 this.NumberRaceCoursesByDate();
                 this.FavouriteVsNumberRaces();
+
+                var favouriteByRaceTypeData = this.GetFavouriteWinsVsRaceType(position, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+                foreach (var set in favouriteByRaceTypeData)
+                {
+                    this.Plotting.PlotBar(this.ViewModel.View.FavouriteVsRaceTypePlot, set.Key, set.Value, true, "Race Type", "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)");
+                    break;
+                }
             }
             else
             {
                 MessageBox.Show("ERROR: Position must be a positive integer!", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private Dictionary<List<string>, List<double>> GetFavouriteWinsVsRaceType(int position, DateTime minDate, DateTime maxDate)
+        {
+            var relevantColumns = new List<Tuple<DateTime, string, int, string>>();
+            var dates = new List<DateTime>();
+            var raceTypes = new List<string>();
+            var positions = new List<int>();
+            var expectations = new List<string>();
+
+            foreach (var column in Data.ProcessedRaceData)
+            {
+                if (column.Key.ToLower() == "date")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        dates.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower() == "race type")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        raceTypes.Add((string)item);
+                    }
+                }
+                else if (column.Key.ToLower() == "position")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        positions.Add((int)item);
+                    }
+                }
+                else if (column.Key.ToLower() == "expectation")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        expectations.Add((string)item);
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < raceTypes.Count; i++)
+            {
+                relevantColumns.Add(new Tuple<DateTime, string, int, string>(dates[i], raceTypes[i], positions[i], expectations[i]));
+            }
+
+            return this.GetFavouriteWinsVsRaceTypeData(relevantColumns, position, minDate, maxDate);
+        }
+
+        private Dictionary<List<string>, List<double>> GetFavouriteWinsVsRaceTypeData(List<Tuple<DateTime, string, int, string>> relevantColumns, int position, DateTime minDate, DateTime maxDate)
+        {
+            var raceTypesVsCount = new Dictionary<string, double>();
+            var raceTypes = new List<string>();
+            var favouriteCount = new List<double>();
+            foreach (var row in relevantColumns)
+            {
+                if (row.Item1 >= minDate && row.Item1 <= maxDate)
+                {
+                    if (row.Item3 == position && row.Item4.ToLower().Trim() == "f")
+                    {
+                        if (raceTypesVsCount.ContainsKey(row.Item2))
+                        {
+                            raceTypesVsCount[row.Item2] = raceTypesVsCount[row.Item2] + 1;
+                        }
+                        else
+                        {
+                            raceTypesVsCount.Add(row.Item2, 1);
+                        }
+                    }
+                }
+            }
+
+            var numberRaceTypes = CommonAnalyses.GetNumberRaceTypes(minDate, maxDate);
+            var raceTypeNumbers = new Dictionary<string, double>();
+            foreach(var set in numberRaceTypes)
+            {
+                for (int i = 0; i < set.Key.Count; i++)
+                {
+                    if (raceTypeNumbers.ContainsKey(set.Key[i]))
+                    {
+                        raceTypeNumbers[set.Key[i]] = raceTypeNumbers[set.Key[i]] + set.Value[i];
+                    }
+                    else
+                    {
+                        raceTypeNumbers.Add(set.Key[i], set.Value[i]);
+                    }
+                }
+
+                break;
+            }
+
+            foreach (var row in raceTypesVsCount)
+            {
+                raceTypes.Add(row.Key);
+                if (raceTypeNumbers.ContainsKey(row.Key))
+                {
+                    favouriteCount.Add(row.Value / raceTypeNumbers[row.Key]);
+                }
+                else
+                {
+                    favouriteCount.Add(row.Value);
+                    MessageBox.Show("WARNING: Unrecognised race type '" + row.Key + "'", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+
+            return new Dictionary<List<string>, List<double>> { { raceTypes, favouriteCount } };
         }
 
         private void FavouriteVsNumberRaces()

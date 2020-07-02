@@ -11,5 +11,6 @@ namespace RaceTracker.Models
         public const string Day = "Day";
         public const string Month = "Month";
         public const string Year = "Year";
+        public const string Season = "Season";
     }
 }

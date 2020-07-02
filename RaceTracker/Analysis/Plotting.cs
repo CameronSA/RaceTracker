@@ -2,10 +2,8 @@
 using ScottPlot;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace RaceTracker.Analysis
 {
@@ -14,7 +12,10 @@ namespace RaceTracker.Analysis
         public Plotting()
         {
             this.TimeSeriesPlotSeriesNames = new List<string>();
+            this.MarkerSize = 7;
         }
+
+        public float MarkerSize { get; set; }
 
         private List<string> TimeSeriesPlotSeriesNames { get; }
 
@@ -24,13 +25,16 @@ namespace RaceTracker.Analysis
             {
                 return;
             }
-
+            
             if (reset)
             {
                 plot.Reset();
             }
 
-            this.TimeSeriesPlotSeriesNames.Add(seriesName);
+            if (!string.IsNullOrEmpty(seriesName))
+            {
+                this.TimeSeriesPlotSeriesNames.Add(seriesName);
+            }
 
             var xNumeric = new List<double>();
             foreach (var item in x)
@@ -38,11 +42,15 @@ namespace RaceTracker.Analysis
                 xNumeric.Add(item.ToOADate());
             }
 
-            plot.plt.PlotScatter(xNumeric.ToArray(), y.ToArray(), lineWidth: 0, label: seriesName);
+            plot.plt.PlotScatter(xNumeric.ToArray(), y.ToArray(), lineWidth: 0, label: seriesName, markerSize: this.MarkerSize);
             plot.plt.Ticks(dateTimeX: true);
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
-            plot.plt.Legend(location: legendLocation.upperRight);
+            if (this.TimeSeriesPlotSeriesNames.Count > 0)
+            {
+                plot.plt.Legend(location: legendLocation.upperRight);
+            }
+
             plot.Render();
         }
 
@@ -58,12 +66,20 @@ namespace RaceTracker.Analysis
                 plot.Reset();
             }
 
-            seriesNames.Add(seriesName);
-            plot.plt.PlotScatter(x.ToArray(), y.ToArray(), lineWidth: 0, label: seriesName);
+            if (!string.IsNullOrEmpty(seriesName))
+            {
+                seriesNames.Add(seriesName);
+            }
+
+            plot.plt.PlotScatter(x.ToArray(), y.ToArray(), lineWidth: 0, label: seriesName, markerSize: this.MarkerSize);
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
-            plot.plt.Axis(xLower, xUpper, yLower, yUpper);            
-            plot.plt.Legend(location: legendLocation.upperRight);
+            plot.plt.Axis(xLower, xUpper, yLower, yUpper);
+            if (seriesNames.Count > 0)
+            {
+                plot.plt.Legend(location: legendLocation.upperRight);
+            }
+
             plot.Render();
         }
 
@@ -108,7 +124,7 @@ namespace RaceTracker.Analysis
             }
 
 
-            plot.plt.PlotScatter(x.ToArray(), y.ToArray(), lineWidth: 0);
+            plot.plt.PlotScatter(x.ToArray(), y.ToArray(), lineWidth: 0, markerSize: this.MarkerSize);
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
 
@@ -188,6 +204,27 @@ namespace RaceTracker.Analysis
             }
 
             plot.plt.AxisAuto();
+            plot.Render();
+        }
+
+        public void PlotBar(WpfPlot plot, IEnumerable<string> x, IEnumerable<double> y, bool reset, string xLabel, string yLabel)
+        {
+            if (x.ToArray().Length < 1 || y.ToArray().Length < 1)
+            {
+                return;
+            }
+
+            if (reset)
+            {
+                plot.Reset();
+            }
+
+            var xs = DataGen.Consecutive(x.ToArray().Length);
+            plot.plt.PlotBar(xs, y.ToArray());
+            plot.plt.YLabel(yLabel);
+            plot.plt.XLabel(xLabel);
+            plot.plt.XTicks(xs, x.ToArray());
+
             plot.Render();
         }
     }

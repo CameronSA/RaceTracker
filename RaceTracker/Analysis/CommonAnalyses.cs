@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,6 +16,8 @@ namespace RaceTracker.Analysis
 
         public static Dictionary<int, int> NumberOfDaysWithGivenNumberOfRaceCourses { get; private set; } = new Dictionary<int, int>(); //Key: number race courses. Value: days
 
+        public static DateTime MinDataDate { get; private set; }
+        public static DateTime MaxDataDate { get; private set; }
         private static DateTime NumberRaceCoursesMin { get; set; }
         private static DateTime NumberRaceCoursesMax { get; set; }
         private static DateTime NumberDaysMin { get; set; }
@@ -24,15 +27,17 @@ namespace RaceTracker.Analysis
 
         public static void LoadInitialData()
         {
+            MinDataDate = Data.GetMinDate();
+            MaxDataDate = Data.GetMaxDate();
             NumberRaceCoursesData = new Dictionary<List<DateTime>, List<double>>();
             NumberOfDaysWithGivenNumberOfRaceCourses = new Dictionary<int, int>();
             Resolution = TimeResolutionFields.Day;
             if (AppSettings.UseFullDataSet)
             {
-                NumberRaceCoursesMin = Data.GetMinDate();
-                NumberRaceCoursesMax = Data.GetMaxDate();
-                NumberDaysMin = Data.GetMinDate();
-                NumberDaysMax = Data.GetMaxDate();
+                NumberRaceCoursesMin = MinDataDate;
+                NumberRaceCoursesMax = MaxDataDate;
+                NumberDaysMin = MinDataDate;
+                NumberDaysMax = MaxDataDate;
             }
             else
             {
@@ -56,6 +61,294 @@ namespace RaceTracker.Analysis
                     CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses.Add(i, result);
                 }
             }
+        }
+
+        public static Dictionary<List<string>, List<double>> GetNumberRaceTypes(DateTime minDate, DateTime maxDate)
+        {
+            var relevantColumns = new List<Tuple<DateTime, DateTime, string>>();
+            var dates = new List<DateTime>();
+            var times = new List<DateTime>();
+            var raceTypes = new List<string>();
+
+            foreach (var column in Data.ProcessedRaceData)
+            {
+                if (column.Key.ToLower().Trim() == "date")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        dates.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower().Trim() == "time")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        times.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower().Trim() == "race type")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        raceTypes.Add((string)item);
+                    }
+                }
+            }
+
+            for (int i = 0; i < dates.Count; i++)
+            {
+                relevantColumns.Add(new Tuple<DateTime, DateTime, string>(dates[i], times[i], raceTypes[i]));
+            }
+
+            return GetNumberRaceTypes(relevantColumns, minDate, maxDate);
+
+            //foreach (var column in Data.ProcessedRaceData)
+            //{
+            //    if(column.Key.ToLower().Trim() == "date")
+            //    {
+            //        for (int i = 0; i < column.Value.Data.Length; i++)
+            //        {
+            //            var date = (DateTime)column.Value.Data[i];
+            //            if (date >= minDate && date <= maxDate)
+            //            {
+            //                raceTypeIndices.Add(i);
+            //            }
+            //        }
+            //    }
+            //}
+
+            //foreach (var column in Data.ProcessedRaceData)
+            //{
+            //    if (column.Key.ToLower().Trim() == "race type")
+            //    {
+            //        foreach(var index in raceTypeIndices)
+            //        {
+            //            var raceType = (string)column.Value.Data[index];
+            //            if (raceTypesCount.ContainsKey(raceType))
+            //            {
+            //                raceTypesCount[raceType] = raceTypesCount[raceType] + 1;
+            //            }
+            //            else
+            //            {
+            //                raceTypesCount.Add(raceType, 1);
+            //            }
+            //        }
+            //    }
+            //}
+
+            //foreach (var item in raceTypesCount)
+            //{
+            //    raceTypes.Add(item.Key);
+            //    counts.Add(item.Value);
+            //}
+
+            //return new Dictionary<List<string>, List<double>> { { raceTypes, counts } };
+        }
+
+        private static Dictionary<List<string>, List<double>> GetNumberRaceTypes(List<Tuple<DateTime, DateTime, string>> rows, DateTime minDate, DateTime maxDate)
+        {
+            var raceTypes = new List<string>();
+            var counts = new List<double>();
+            var raceTypesByRace = new Dictionary<string, HashSet<string>>();
+            foreach (var row in rows)
+            {
+                if (row.Item1 >= minDate && row.Item1 <= maxDate)
+                {
+                    var key = row.Item1.ToString() + " " + row.Item2.ToString();
+                    if (raceTypesByRace.ContainsKey(key))
+                    {
+                        raceTypesByRace[key].Add(row.Item3);
+                    }
+                    else
+                    {
+                        raceTypesByRace.Add(key, new HashSet<string> { row.Item3 });
+                    }
+                }
+            }
+
+            var raceTypesCount = new Dictionary<string, double>();
+            foreach (var race in raceTypesByRace)
+            {
+                foreach(var raceType in race.Value)
+                {
+                    if(raceTypesCount.ContainsKey(raceType))
+                    {
+                        raceTypesCount[raceType] += 1;
+                    }
+                    else
+                    {
+                        raceTypesCount.Add(raceType, 1);
+                    }
+                }
+            }
+
+            foreach(var race in raceTypesCount)
+            {
+                raceTypes.Add(race.Key);
+                counts.Add(race.Value);
+            }
+
+            return new Dictionary<List<string>, List<double>> { { raceTypes, counts } };
+        }
+
+        public static List<Tuple<string, Dictionary<List<double>, List<double>>>> GetNumberRaceCoursesByDayCountBySeason()
+        {
+            var numberRaceCoursesByDay = CommonAnalyses.RetrieveNumberRaceCoursesData(TimeResolutionFields.Day, MinDataDate, MaxDataDate);
+            var springIndices = new List<int>();
+            var summerIndices = new List<int>();
+            var autumnIndices = new List<int>();
+            var winterIndices = new List<int>();
+
+            var numberVsCountWinter = new Dictionary<double, double>();
+            var numberVsCountSpring = new Dictionary<double, double>();
+            var numberVsCountSummer = new Dictionary<double, double>();
+            var numberVsCountAutumn = new Dictionary<double, double>();
+
+            var winterNumbers = new List<double>();
+            var winterCounts = new List<double>();
+            var springNumbers = new List<double>();
+            var springCounts = new List<double>();
+            var summerNumbers = new List<double>();
+            var summerCounts = new List<double>();
+            var autumnNumbers = new List<double>();
+            var autumnCounts = new List<double>();
+
+            foreach (var dataSet in numberRaceCoursesByDay)
+            {
+                for (int i = 0; i < dataSet.Key.Count; i++)
+                {
+                    if (dataSet.Key[i].Month == 12 || dataSet.Key[i].Month == 1 || dataSet.Key[i].Month == 2)
+                    {
+                        winterIndices.Add(i);
+                    }
+                    else if (dataSet.Key[i].Month == 3 || dataSet.Key[i].Month == 4 || dataSet.Key[i].Month == 5)
+                    {
+                        springIndices.Add(i);
+                    }
+                    else if (dataSet.Key[i].Month == 6 || dataSet.Key[i].Month == 7 || dataSet.Key[i].Month == 8)
+                    {
+                        summerIndices.Add(i);
+                    }
+                    else
+                    {
+                        autumnIndices.Add(i);
+                    }
+                }
+
+                foreach (var index in winterIndices)
+                {
+                    if (numberVsCountWinter.ContainsKey(dataSet.Value[index]))
+                    {
+                        numberVsCountWinter[dataSet.Value[index]] = numberVsCountWinter[dataSet.Value[index]] + 1;
+                    }
+                    else
+                    {
+                        numberVsCountWinter.Add(dataSet.Value[index], 1);
+                    }
+                }
+
+                foreach (var index in springIndices)
+                {
+                    if (numberVsCountSpring.ContainsKey(dataSet.Value[index]))
+                    {
+                        numberVsCountSpring[dataSet.Value[index]] = numberVsCountSpring[dataSet.Value[index]] + 1;
+                    }
+                    else
+                    {
+                        numberVsCountSpring.Add(dataSet.Value[index], 1);
+                    }
+                }
+
+                foreach (var index in summerIndices)
+                {
+                    if (numberVsCountSummer.ContainsKey(dataSet.Value[index]))
+                    {
+                        numberVsCountSummer[dataSet.Value[index]] = numberVsCountSummer[dataSet.Value[index]] + 1;
+                    }
+                    else
+                    {
+                        numberVsCountSummer.Add(dataSet.Value[index], 1);
+                    }
+                }
+
+                foreach (var index in autumnIndices)
+                {
+                    if (numberVsCountAutumn.ContainsKey(dataSet.Value[index]))
+                    {
+                        numberVsCountAutumn[dataSet.Value[index]] = numberVsCountAutumn[dataSet.Value[index]] + 1;
+                    }
+                    else
+                    {
+                        numberVsCountAutumn.Add(dataSet.Value[index], 1);
+                    }
+                }
+
+                foreach (var number in numberVsCountWinter)
+                {
+                    winterNumbers.Add(number.Key);
+                    winterCounts.Add(number.Value);
+                }
+
+                foreach (var number in numberVsCountSpring)
+                {
+                    springNumbers.Add(number.Key);
+                    springCounts.Add(number.Value);
+                }
+
+                foreach (var number in numberVsCountSummer)
+                {
+                    summerNumbers.Add(number.Key);
+                    summerCounts.Add(number.Value);
+                }
+
+                foreach (var number in numberVsCountAutumn)
+                {
+                    autumnNumbers.Add(number.Key);
+                    autumnCounts.Add(number.Value);
+                }
+
+                break;
+            }
+
+            return new List<Tuple<string, Dictionary<List<double>, List<double>>>>
+            {
+                new Tuple<string, Dictionary<List<double>, List<double>>>("Winter",new Dictionary<List<double>, List<double>>{{winterNumbers,winterCounts}}),
+                new Tuple<string, Dictionary<List<double>, List<double>>>("Spring",new Dictionary<List<double>, List<double>>{{springNumbers,springCounts}}),
+                new Tuple<string, Dictionary<List<double>, List<double>>>("Summer",new Dictionary<List<double>, List<double>>{{summerNumbers,summerCounts}}),
+                new Tuple<string, Dictionary<List<double>, List<double>>>("Autumn",new Dictionary<List<double>, List<double>>{{autumnNumbers,autumnCounts}})
+            };
+        }
+        
+        public static Dictionary<List<double>,List<double>> GetNumberRaceCoursesByDayCount()
+        {
+            var numbers = new List<double>();
+            var counts = new List<double>();
+            var numberRaceCoursesByDay = CommonAnalyses.RetrieveNumberRaceCoursesData(TimeResolutionFields.Day, MinDataDate, MaxDataDate);
+            var numbersVsCount = new Dictionary<double, double>();
+            foreach(var dataSet in numberRaceCoursesByDay)
+            {
+                foreach (var numberRaceCourses in dataSet.Value)
+                {
+                    if (numbersVsCount.ContainsKey(numberRaceCourses))
+                    {
+                        numbersVsCount[numberRaceCourses] = numbersVsCount[numberRaceCourses] + 1;
+                    }
+                    else
+                    {
+                        numbersVsCount.Add(numberRaceCourses, 1);
+                    }
+                }
+
+                foreach(var number in numbersVsCount)
+                {
+                    numbers.Add(number.Key);
+                    counts.Add(number.Value);
+                }
+
+                break;
+            }
+
+            return new Dictionary<List<double>, List<double>> { { numbers, counts } };
         }
 
         public static Dictionary<List<DateTime>, List<double>> RetrieveNumberRaceCoursesData(string resolution, DateTime minDate, DateTime maxDate)

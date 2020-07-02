@@ -53,7 +53,8 @@
                         <Button Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Path=Command}" CommandParameter="btPositionGo" FontSize="14" Width="100"/>
                     </Grid>                    
                     <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="FavouritePlot"/>
-                    <WpfPlot Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4" Grid.RowSpan="3" Name="FavouriteVsNumberRaceCoursesPlot"/>
+                    <WpfPlot Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="FavouriteVsNumberRaceCoursesPlot"/>
+                    <WpfPlot Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="FavouriteVsRaceTypePlot"/>
                 </Grid>              
             </TabItem>
             <TabItem Header=" Daily Race Profile ">
@@ -85,7 +86,6 @@
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="2*"/>
-                            <RowDefinition Height="5*"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
@@ -97,12 +97,17 @@
                         <DatePicker Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MaxDate, Mode=TwoWay}"/>
 
                         <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Path=Command}" CommandParameter="btDailyProfileGo" FontSize="14" Width="100"/>
-
-                        <TextBlock TextWrapping="Wrap" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Text="Note to self: Filter on lower odds and race type (flat + everything else). Make poisson plot with position instead of number racecourses. Add option for top 3 as well as particular position. Run analyses async"/>
                     </Grid>
                     <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="DailyProfilePlot"/>
                     <WpfPlot Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="DailyProfileVsNumberRaceCoursesOverallPlot"/>
                     <WpfPlot Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="DailyProfileVsNumberRaceCoursesIndividualPlot"/>
+                    <Grid Grid.Row="3" Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="*Numbers represent the number of occurances of that data point normalised to the number of days with that number of race courses" TextWrapping="Wrap"/>
+                    </Grid>
                     <Grid Grid.Row="3" Grid.Column="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -129,6 +134,22 @@
                         
                         <CheckBox Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Reset" FontSize="10" IsChecked="{Binding Path=Model.ResetIndividual, Mode=TwoWay}"/>
                     </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header=" Race Track Profile ">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <WpfPlot Grid.Column="0" Grid.Row="0" Name="NumberRaceTracksPerDay"/>
+                    <WpfPlot Grid.Column="1" Grid.Row="0" Name="NumberRaceTracksPerDayCount"/>
+                    <WpfPlot Grid.Column="0" Grid.Row="1" Name="NumberRaceTypes"/>
+                    <WpfPlot Grid.Column="1" Grid.Row="1" Name="NumberRaceTypesPerDay"/>
                 </Grid>
             </TabItem>
         </TabControl>
