@@ -45,7 +45,7 @@ namespace RaceTracker.Analysis
                 var favouriteByRaceTypeData = this.GetFavouriteWinsVsRaceType(position, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
                 foreach (var set in favouriteByRaceTypeData)
                 {
-                    this.Plotting.PlotBar(this.ViewModel.View.FavouriteVsRaceTypePlot, set.Key, set.Value, true, "Race Type", "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)");
+                    this.Plotting.PlotBar(this.ViewModel.View.FavouriteVsRaceTypePlot, set.Key, set.Value, true, "Race Type", "Probability of Favourite Finishing in Position " + this.ViewModel.Model.Position + " (%)");
                     break;
                 }
             }

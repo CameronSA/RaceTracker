@@ -104,9 +104,10 @@
                     <Grid Grid.Row="3" Grid.Column="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="*Numbers represent the number of occurances of that data point normalised to the number of days with that number of race courses" TextWrapping="Wrap"/>
+                        <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left" Text="*Numbers represent the number of occurances of that data point normalised to the number of days with that number of race courses running" TextWrapping="Wrap"/>
                     </Grid>
                     <Grid Grid.Row="3" Grid.Column="2">
                         <Grid.ColumnDefinitions>
@@ -150,6 +151,7 @@
                     <WpfPlot Grid.Column="1" Grid.Row="0" Name="NumberRaceTracksPerDayCount"/>
                     <WpfPlot Grid.Column="0" Grid.Row="1" Name="NumberRaceTypes"/>
                     <WpfPlot Grid.Column="1" Grid.Row="1" Name="NumberRaceTypesPerDay"/>
+                    <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Number of race types split by season/Race types by day" FontSize="20" TextWrapping="Wrap"/>
                 </Grid>
             </TabItem>
         </TabControl>

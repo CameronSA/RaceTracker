@@ -37,7 +37,7 @@ namespace RaceTracker.Analysis
                 this.DailyRaceProfileData = this.GetDailyRaceProfileData(position, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
                 foreach (var set in DailyRaceProfileData)
                 {
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Number of races before favourite finishes in position " + this.ViewModel.Model.Position);
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Number of Races Before Favourite Finishes In Position " + this.ViewModel.Model.Position);
                     break;
                 }
 
@@ -164,7 +164,7 @@ namespace RaceTracker.Analysis
                 { numberRaceTracks, numberRacesBeforeFavouriteWin }
             };
 
-            this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position, "Number of Race Courses Running", NormalisingFactors.NumberOfRaceTracks, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+            this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position, "Number of Race Courses Running Per Day", NormalisingFactors.NumberOfRaceTracks, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
         }
 
         private void NumberRaceCoursesByDate()
