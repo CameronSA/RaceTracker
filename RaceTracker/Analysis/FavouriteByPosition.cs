@@ -33,13 +33,14 @@ namespace RaceTracker.Analysis
             if (int.TryParse(this.ViewModel.Model.Position, out int position) && position > 0)
             {
                 this.PositionProbabilityData = this.GetFavouriteByPostionData(position, this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+
+                this.NumberRaceCoursesByDate();
                 foreach (var set in this.PositionProbabilityData)
                 {
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)");
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, false, string.Empty, string.Empty, "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)");
                     break;
                 }
 
-                this.NumberRaceCoursesByDate();
                 this.FavouriteVsNumberRaces();
 
                 var favouriteByRaceTypeData = this.GetFavouriteWinsVsRaceType(position, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
@@ -223,7 +224,7 @@ namespace RaceTracker.Analysis
             this.NumberRaceCoursesData = CommonAnalyses.RetrieveNumberRaceCoursesData(this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
             foreach (var set in NumberRaceCoursesData)
             {
-                this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, false, string.Empty, string.Empty, "Number of Race Courses Running");
+                this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Number of Race Courses Running");
             }
         }
 

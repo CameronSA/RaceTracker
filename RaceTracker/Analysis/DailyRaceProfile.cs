@@ -32,6 +32,9 @@ namespace RaceTracker.Analysis
             if (int.TryParse(this.ViewModel.Model.Position, out int position) && position > 0)
             {
                 this.DailyRaceProfileData = this.GetDailyRaceProfileData(position, this.ViewModel.Model.UpToAndIncludingPosition, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+
+                this.NumberRaceCoursesByDate();
+
                 foreach (var set in DailyRaceProfileData)
                 {
                     string ylabel;
@@ -44,11 +47,10 @@ namespace RaceTracker.Analysis
                         ylabel = "Number of Races Before Favourite Finishes In Position " + this.ViewModel.Model.Position;
                     }
 
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, ylabel);
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, false, string.Empty, string.Empty, ylabel);
                     break;
                 }
 
-                this.NumberRaceCoursesByDate();
                 this.DailyRaceProfileVsNumberRaceCourses();
 
                 if (int.TryParse(this.ViewModel.Model.IndividualNumberRacecoursesMin, out int numberRacecoursesMin) && int.TryParse(this.ViewModel.Model.IndividualNumberRacecoursesMax, out int numberRacecoursesMax) && numberRacecoursesMin > 0 && numberRacecoursesMax > 0)
@@ -201,7 +203,7 @@ namespace RaceTracker.Analysis
             this.NumberRaceCoursesData = CommonAnalyses.RetrieveNumberRaceCoursesData(TimeResolutionFields.Day, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
             foreach (var set in NumberRaceCoursesData)
             {
-                this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, false, string.Empty, string.Empty, "Number of Race Courses Running");
+                this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Number of Race Courses Running");
             }
         }
 
