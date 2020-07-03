@@ -23,6 +23,20 @@ namespace RaceTracker.Models
         private string individualNumberRacecoursesMax;
         private bool resetIndividual;
         private bool upToAndIncludingPosition;
+        private bool splitByPosition;
+
+        public bool SplitByPosition
+        {
+            get
+            {
+                return this.splitByPosition;
+            }
+            set
+            {
+                this.splitByPosition = value;
+                this.OnPropertyChanged("SplitByPosition");
+            }
+        }
 
         public bool UpToAndIncludingPosition
         {

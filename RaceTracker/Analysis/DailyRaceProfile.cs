@@ -4,6 +4,7 @@ using RaceTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
 
 namespace RaceTracker.Analysis
@@ -56,9 +57,32 @@ namespace RaceTracker.Analysis
                 if (int.TryParse(this.ViewModel.Model.IndividualNumberRacecoursesMin, out int numberRacecoursesMin) && int.TryParse(this.ViewModel.Model.IndividualNumberRacecoursesMax, out int numberRacecoursesMax) && numberRacecoursesMin > 0 && numberRacecoursesMax > 0)
                 {
                     bool reset = this.ViewModel.Model.ResetIndividual;
-                    for (int i = numberRacecoursesMin; i <= numberRacecoursesMax; i++)
+
+                    if (this.ViewModel.Model.SplitByPosition)
                     {
-                        this.DailyRaceProfilePerNumberRaceCourses(i, this.ViewModel.Model.ResetIndividual);
+                        var numberRaceTracks = new List<int>();
+                        for (int n = numberRacecoursesMin; n <= numberRacecoursesMax; n++)
+                        {
+                            numberRaceTracks.Add(n);
+                        }
+
+                        int daysWithNumberOfRaceCourses = 0;
+                        foreach (var number in numberRaceTracks)
+                        {
+                            daysWithNumberOfRaceCourses += CommonAnalyses.RetrieveNumberOfDaysWithGivenNumberOfRaceCourses(number, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
+                        }
+
+                        for (int i = 1; i <= position; i++)
+                        {
+                            this.DailyRaceProfilePerPosition(i, this.ViewModel.Model.ResetIndividual, numberRaceTracks, daysWithNumberOfRaceCourses);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = numberRacecoursesMin; i <= numberRacecoursesMax; i++)
+                        {
+                            this.DailyRaceProfilePerNumberRaceCourses(i, this.ViewModel.Model.ResetIndividual);
+                        }
                     }
 
                     this.ViewModel.Model.ResetIndividual = reset;
@@ -72,6 +96,108 @@ namespace RaceTracker.Analysis
             {
                 MessageBox.Show("ERROR: Position must be a positive integer!", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void DailyRaceProfilePerPosition(int position, bool reset, List<int> numberRaceTracksList, int daysWithNumberOfRaceCourses)
+        {
+            var dailyRaceProfileData = this.GetDailyRaceProfileData(position, this.ViewModel.Model.UpToAndIncludingPosition, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate); var numberRacesBeforeFavouriteWin = new List<double>();
+            var raceProfile = new List<double>();
+            var count = new List<double>();
+            var numberRaceTracks = new List<double>();
+            var positionDateIndices = new Dictionary<DateTime, int>();
+            var numberRacesDateIndices = new Dictionary<DateTime, int>();
+            var numberRaceTracksVsProfile = new List<Tuple<double, double>>();
+            var numberRacesBeforeFavouriteWinVsCount = new Dictionary<double, double>();
+
+            foreach (var dataSet in dailyRaceProfileData)
+            {
+                for (int i = 0; i < dataSet.Key.Count; i++)
+                {
+                    if (!positionDateIndices.ContainsKey(dataSet.Key[i]))
+                    {
+                        positionDateIndices.Add(dataSet.Key[i], i);
+                    }
+                    else
+                    {
+                        MessageBox.Show("WARNING: Duplicate dates", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+
+                foreach (var dataIndex in positionDateIndices)
+                {
+                    numberRacesBeforeFavouriteWin.Add(dataSet.Value[dataIndex.Value]);
+                }
+
+                break;
+            }
+
+            foreach (var dataSet in this.NumberRaceCoursesData)
+            {
+                for (int i = 0; i < dataSet.Key.Count; i++)
+                {
+                    if (!numberRacesDateIndices.ContainsKey(dataSet.Key[i]))
+                    {
+                        numberRacesDateIndices.Add(dataSet.Key[i], i);
+                    }
+                    else
+                    {
+                        MessageBox.Show("WARNING: Duplicate dates", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+
+                foreach (var dataIndex in numberRacesDateIndices)
+                {
+                    numberRaceTracks.Add(dataSet.Value[dataIndex.Value]);
+                }
+
+                break;
+            }
+
+            for (int i = 0; i < numberRacesBeforeFavouriteWin.Count; i++)
+            {
+                if (numberRaceTracksList.Contains((int)numberRaceTracks[i]))
+                {
+                    numberRaceTracksVsProfile.Add(new Tuple<double, double>(numberRaceTracks[i], numberRacesBeforeFavouriteWin[i]));
+                }
+            }
+
+            foreach (var item in numberRaceTracksVsProfile)
+            {
+                if (!numberRacesBeforeFavouriteWinVsCount.ContainsKey(item.Item2))
+                {
+                    numberRacesBeforeFavouriteWinVsCount.Add(item.Item2, 0);
+                }
+                else
+                {
+                    numberRacesBeforeFavouriteWinVsCount[item.Item2] = numberRacesBeforeFavouriteWinVsCount[item.Item2] += (1.0 / (double)daysWithNumberOfRaceCourses);
+                }
+            }
+
+            foreach (var item in numberRacesBeforeFavouriteWinVsCount)
+            {
+                raceProfile.Add(item.Key);
+                count.Add(100 * item.Value);
+            }
+
+
+            if (reset)
+            {
+                this.individualPlotSeries = new List<string>();
+                this.ViewModel.Model.ResetIndividual = false;
+            }
+
+            string seriesName;
+
+            if (this.ViewModel.Model.UpToAndIncludingPosition)
+            {
+                seriesName = "Position Up To and Including " + position + ". Racetrack Number Range: " + this.ViewModel.Model.IndividualNumberRacecoursesMin + "-" + this.ViewModel.Model.IndividualNumberRacecoursesMax;
+            }
+            else
+            {
+                seriesName = "Position " + position + ". Racetrack Number Range: " + this.ViewModel.Model.IndividualNumberRacecoursesMin + "-" + this.ViewModel.Model.IndividualNumberRacecoursesMax;
+            }
+
+            this.Plotting.PlotScatter(this.ViewModel.View.DailyProfileVsNumberRaceCoursesIndividualPlot, raceProfile, count, reset, "Number of Races Before Win", "Probability (%)", this.individualPlotSeries, seriesName, -1, 45, -2, 80);
         }
 
         private void DailyRaceProfilePerNumberRaceCourses(int numberRaceCourses, bool reset)
@@ -103,7 +229,7 @@ namespace RaceTracker.Analysis
             foreach (var item in numberRacesBeforeFavouriteWinVsCount)
             {
                 raceProfile.Add(item.Key);
-                raceProfileCount.Add(item.Value);
+                raceProfileCount.Add(100 * item.Value);
             }
 
             if (reset)
@@ -126,7 +252,7 @@ namespace RaceTracker.Analysis
                 ylabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position;
             }
 
-            this.Plotting.PlotScatter(this.ViewModel.View.DailyProfileVsNumberRaceCoursesIndividualPlot, raceProfile, raceProfileCount, reset, ylabel, "Count/# Days", this.individualPlotSeries, seriesName, -1, 45, -0.02, 0.8);
+            this.Plotting.PlotScatter(this.ViewModel.View.DailyProfileVsNumberRaceCoursesIndividualPlot, raceProfile, raceProfileCount, reset, ylabel, "Probability (%)", this.individualPlotSeries, seriesName, -1, 45, -2, 80);
         }
 
         private void DailyRaceProfileVsNumberRaceCourses()
@@ -188,11 +314,11 @@ namespace RaceTracker.Analysis
             string xLabel;
             if (this.ViewModel.Model.UpToAndIncludingPosition)
             {
-                xLabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position;
+                xLabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position + " or Less";
             }
             else
             {
-                xLabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position + " or Less";
+                xLabel = "Number of Races Before Favourite Finishes in Position " + this.ViewModel.Model.Position;
             }
 
             this.Plotting.PlotScatterLabels(this.ViewModel.View.DailyProfileVsNumberRaceCoursesOverallPlot, numberRacesBeforeFavouriteWin, numberRaceTracks, xLabel, "Number of Race Courses Running Per Day", NormalisingFactors.NumberOfRaceTracks, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);

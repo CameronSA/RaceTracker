@@ -27,7 +27,7 @@ namespace RaceTracker.ViewModels
                 MinDate = CommonAnalyses.MinDataDate,
                 MaxDate = CommonAnalyses.MaxDataDate,
                 IndividualNumberRacecoursesMin = "1",
-                IndividualNumberRacecoursesMax = "15",
+                IndividualNumberRacecoursesMax = "10",
             };
 
             if (this.Model.DataHeaders.Count > 0)
