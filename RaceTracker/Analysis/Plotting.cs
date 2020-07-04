@@ -54,6 +54,7 @@ namespace RaceTracker.Analysis
             plot.plt.Ticks(dateTimeX: true);
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
+            plot.plt.AxisAuto();
             if (this.TimeSeriesPlotSeriesNames.Count > 0)
             {
                 plot.plt.Legend(location: legendLocation.upperRight);
@@ -89,6 +90,7 @@ namespace RaceTracker.Analysis
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
             plot.plt.Axis(xLower, xUpper, yLower, yUpper);
+
             if (seriesNames.Count > 0)
             {
                 plot.plt.Legend(location: legendLocation.upperRight);

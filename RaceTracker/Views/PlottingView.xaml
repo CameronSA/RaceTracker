@@ -38,6 +38,7 @@
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
@@ -45,12 +46,13 @@
                         <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.Position, Mode=TwoWay}" Width="100"/>
                         <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Resolution:" FontSize="18"/>
                         <ComboBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" ItemsSource="{Binding Path=Model.TimeResolutionFields}" SelectedItem="{Binding Path=Model.TimeResolutionField, Mode=TwoWay}" FontSize="14" Width="100"/>
-                        <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Min Date" FontSize="18"/>
-                        <TextBlock Grid.Row="3" Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Max Date" FontSize="18"/>
-                        <DatePicker Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MinDate, Mode=TwoWay}"/>
-                        <DatePicker Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MaxDate, Mode=TwoWay}"/>
+                        <CheckBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Up To and Including Position" IsChecked="{Binding Path=Model.UpToAndIncludingPosition}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Min Date" FontSize="18"/>
+                        <TextBlock Grid.Row="4" Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Max Date" FontSize="18"/>
+                        <DatePicker Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MinDate, Mode=TwoWay}"/>
+                        <DatePicker Grid.Row="5" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MaxDate, Mode=TwoWay}"/>
 
-                        <Button Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Path=Command}" CommandParameter="btPositionGo" FontSize="14" Width="100"/>
+                        <Button Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Content="Go" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding Path=Command}" CommandParameter="btPositionGo" FontSize="14" Width="100"/>
                     </Grid>                    
                     <WpfPlot Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" Name="FavouritePlot"/>
                     <WpfPlot Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Grid.RowSpan="3" Name="FavouriteVsNumberRaceCoursesPlot"/>
@@ -92,7 +94,7 @@
 
                         <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Position:" FontSize="18"/>
                         <TextBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.Position, Mode=TwoWay}" Width="100"/>
-                        <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Up to and Including Position" IsChecked="{Binding Path=Model.UpToAndIncludingPosition}"/>
+                        <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Up to and Including Position" IsChecked="{Binding Path=Model.UpToAndIncludingPosition}"/>                        
                         <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Min Date" FontSize="18"/>
                         <TextBlock Grid.Row="3" Grid.Column="2" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Max Date" FontSize="18"/>
                         <DatePicker Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" SelectedDate="{Binding Path=Model.MinDate, Mode=TwoWay}"/>

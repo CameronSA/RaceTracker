@@ -37,7 +37,17 @@ namespace RaceTracker.Analysis
                 this.NumberRaceCoursesByDate();
                 foreach (var set in this.PositionProbabilityData)
                 {
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, false, string.Empty, string.Empty, "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)");
+                    string label;
+                    if (this.ViewModel.Model.UpToAndIncludingPosition)
+                    {
+                        label = "Favourites Finishing up to Position " + this.ViewModel.Model.Position + " (%) (NORMALISATION INVALID)";
+                    }
+                    else
+                    {
+                        label = "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)";
+                    }
+
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, false, string.Empty, string.Empty, label);
                     break;
                 }
 
@@ -46,7 +56,16 @@ namespace RaceTracker.Analysis
                 var favouriteByRaceTypeData = this.GetFavouriteWinsVsRaceType(position, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
                 foreach (var set in favouriteByRaceTypeData)
                 {
-                    this.Plotting.PlotBar(this.ViewModel.View.FavouriteVsRaceTypePlot, set.Key, set.Value, true, "Race Type", "Probability of Favourite Finishing in Position " + this.ViewModel.Model.Position + " (%)");
+                    string yLabel;
+                    if (this.ViewModel.Model.UpToAndIncludingPosition)
+                    {
+                        yLabel = "Probability of Favourite Finishing up to Position " + this.ViewModel.Model.Position + " (%)";
+                    }
+                    else
+                    {
+                        yLabel = "Probability of Favourite Finishing in Position " + this.ViewModel.Model.Position + " (%)";
+                    }
+                    this.Plotting.PlotBar(this.ViewModel.View.FavouriteVsRaceTypePlot, set.Key, set.Value, true, "Race Type", yLabel);
                     break;
                 }
             }
@@ -114,7 +133,7 @@ namespace RaceTracker.Analysis
             {
                 if (row.Item1 >= minDate && row.Item1 <= maxDate)
                 {
-                    if (row.Item3 == position && row.Item4.ToLower().Trim() == "f")
+                    if ((row.Item3 == position || (row.Item3 <= position && this.ViewModel.Model.UpToAndIncludingPosition && row.Item3 > 0)) && row.Item4.ToLower().Trim() == "f")
                     {
                         if (raceTypesVsCount.ContainsKey(row.Item2))
                         {
@@ -215,8 +234,17 @@ namespace RaceTracker.Analysis
                 break;
             }
 
-            this.Plotting.PlotScatter(this.ViewModel.View.FavouriteVsNumberRaceCoursesPlot, positionProbabilities, numberRaceTracks, true, "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)", "Number of Race Courses Running", new List<string>(), string.Empty);
-            
+            string xLabel;
+            if (this.ViewModel.Model.UpToAndIncludingPosition)
+            {
+                xLabel = "Favourites Finishing up to Position " + this.ViewModel.Model.Position + " (%)";
+            }
+            else
+            {
+                xLabel = "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)";
+            }
+
+            this.Plotting.PlotScatter(this.ViewModel.View.FavouriteVsNumberRaceCoursesPlot, positionProbabilities, numberRaceTracks, true, xLabel, "Number of Race Courses Running", new List<string>(), string.Empty);
         }
 
         private void NumberRaceCoursesByDate()
@@ -291,7 +319,7 @@ namespace RaceTracker.Analysis
                     }
 
                     // Check that favourite finished in the given position
-                    if (row.Item2 == position)
+                    if (row.Item2 == position || (row.Item2 <= position && this.ViewModel.Model.UpToAndIncludingPosition && row.Item2 > 0))
                     {
                         if (row.Item3.ToLower().Trim() == "f")
                         {

@@ -421,6 +421,7 @@ namespace RaceTracker.LogicHelpers
             raceData.Data = horseAgeData.ToArray();
             return raceData;
         }
+
         private static RaceData ProcessISPColumn(KeyValuePair<string,string[]> data)
         {
             var raceData = new RaceData(typeof(double));

@@ -24,6 +24,33 @@ namespace RaceTracker.Models
         private bool resetIndividual;
         private bool upToAndIncludingPosition;
         private bool splitByPosition;
+        private string minOdds;
+        private string maxOdds;
+
+        public string MinOdds
+        { 
+            get
+            {
+                return this.minOdds;
+            }
+            set
+            {
+                this.minOdds = value;
+                this.OnPropertyChanged("MinOdds");
+            }
+        }
+        public string MaxOdds
+        {
+            get
+            {
+                return this.maxOdds;
+            }
+            set
+            {
+                this.maxOdds = value;
+                this.OnPropertyChanged("MaxOdds");
+            }
+        }
 
         public bool SplitByPosition
         {
