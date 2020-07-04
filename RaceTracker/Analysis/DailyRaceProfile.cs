@@ -48,7 +48,7 @@ namespace RaceTracker.Analysis
                         ylabel = "Number of Races Before Favourite Finishes In Position " + this.ViewModel.Model.Position;
                     }
 
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, false, string.Empty, string.Empty, ylabel);
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, false, string.Empty, string.Empty, new List<string>(), ylabel);
                     break;
                 }
 
@@ -329,7 +329,7 @@ namespace RaceTracker.Analysis
             this.NumberRaceCoursesData = CommonAnalyses.RetrieveNumberRaceCoursesData(TimeResolutionFields.Day, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
             foreach (var set in NumberRaceCoursesData)
             {
-                this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Number of Race Courses Running");
+                this.Plotting.PlotTimeSeries(this.ViewModel.View.DailyProfilePlot, set.Key, set.Value, true, string.Empty, string.Empty, new List<string>(), "Number of Race Courses Running");
             }
         }
 

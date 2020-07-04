@@ -29,7 +29,7 @@ namespace RaceTracker.ViewModels
                 IndividualNumberRacecoursesMin = "1",
                 IndividualNumberRacecoursesMax = "10",
                 MinOdds = "0",
-                MaxOdds = "200",
+                MaxOdds = "20",
             };
 
             if (this.Model.DataHeaders.Count > 0)
@@ -51,7 +51,7 @@ namespace RaceTracker.ViewModels
             var data = CommonAnalyses.RetrieveNumberRaceCoursesData(TimeResolutionFields.Day, CommonAnalyses.MinDataDate, CommonAnalyses.MaxDataDate);
             foreach (var set in data)
             {
-                new Plotting().PlotTimeSeries(this.View.NumberRaceTracksPerDay, set.Key, set.Value, true, string.Empty, "Number of Race Courses", string.Empty);
+                new Plotting().PlotTimeSeries(this.View.NumberRaceTracksPerDay, set.Key, set.Value, true, string.Empty, "Number of Race Courses", new List<string>(), string.Empty);
                 break;
             }
         }

@@ -95,6 +95,7 @@
     <Compile Include="Analysis\CommonAnalyses.cs" />
     <Compile Include="Analysis\DailyRaceProfile.cs" />
     <Compile Include="Analysis\FavouriteByPosition.cs" />
+    <Compile Include="Analysis\OddsProfile.cs" />
     <Compile Include="Analysis\Plotting.cs" />
     <Compile Include="Commands\PlottingCommand.cs" />
     <Compile Include="LogicHelpers\AppSettings.cs" />

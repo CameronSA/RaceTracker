@@ -13,15 +13,12 @@ namespace RaceTracker.Analysis
     {
         public Plotting()
         {
-            this.TimeSeriesPlotSeriesNames = new List<string>();
             this.MarkerSize = 7;
         }
 
         public float MarkerSize { get; set; }
 
-        private List<string> TimeSeriesPlotSeriesNames { get; }
-
-        public void PlotTimeSeries(WpfPlot plot, IEnumerable<DateTime> x, IEnumerable<double> y, bool reset, string xLabel, string yLabel, string seriesName)
+        public void PlotTimeSeries(WpfPlot plot, IEnumerable<DateTime> x, IEnumerable<double> y, bool reset, string xLabel, string yLabel, List<string> seriesList, string seriesName)
         {
             if (x.ToArray().Length < 1 || y.ToArray().Length < 1)
             {
@@ -39,15 +36,15 @@ namespace RaceTracker.Analysis
                 plot.Reset();
             }
 
-            if (!string.IsNullOrEmpty(seriesName))
-            {
-                this.TimeSeriesPlotSeriesNames.Add(seriesName);
-            }
-
             var xNumeric = new List<double>();
             foreach (var item in x)
             {
                 xNumeric.Add(item.ToOADate());
+            }
+
+            if (!string.IsNullOrEmpty(seriesName))
+            {
+                seriesList.Add(seriesName);
             }
 
             plot.plt.PlotScatter(xNumeric.ToArray(), y.ToArray(), lineWidth: 0, label: seriesName, markerSize: this.MarkerSize);
@@ -55,7 +52,8 @@ namespace RaceTracker.Analysis
             plot.plt.XLabel(xLabel);
             plot.plt.YLabel(yLabel);
             plot.plt.AxisAuto();
-            if (this.TimeSeriesPlotSeriesNames.Count > 0)
+
+            if (seriesList.Count > 0)
             {
                 plot.plt.Legend(location: legendLocation.upperRight);
             }
@@ -229,7 +227,7 @@ namespace RaceTracker.Analysis
             plot.Render();
         }
 
-        public void PlotBar(WpfPlot plot, IEnumerable<string> x, IEnumerable<double> y, bool reset, string xLabel, string yLabel)
+        public void PlotBar(WpfPlot plot, IEnumerable<string> x, IEnumerable<double> y, bool reset, string xLabel, string yLabel, float rotation = 0, int yMin = 0, int yMax = 0)
         {
             if (x.ToArray().Length < 1 || y.ToArray().Length < 1)
             {
@@ -249,9 +247,56 @@ namespace RaceTracker.Analysis
 
             var xs = DataGen.Consecutive(x.ToArray().Length);
             plot.plt.PlotBar(xs, y.ToArray());
+            plot.plt.XTicks(xs, x.ToArray());
+            plot.plt.Ticks(xTickRotation: rotation);
             plot.plt.YLabel(yLabel);
             plot.plt.XLabel(xLabel);
-            plot.plt.XTicks(xs, x.ToArray());
+            if (yMin != 0 || yMax != 0)
+            {
+                plot.plt.Axis(y1: yMin, y2: yMax);
+            }
+
+            plot.Render();
+        }
+
+        public void PlotBarGroups(WpfPlot plot, IEnumerable<string> x, IEnumerable<double> y, List<double[]> seriesValues, bool reset, string xLabel, string yLabel, List<string> seriesNames, string seriesName, int yMin = 0, int yMax = 0)
+        {
+            if (x.ToArray().Length < 1 || y.ToArray().Length < 1)
+            {
+                return;
+            }
+
+            if (x.ToArray().Length != y.ToArray().Length)
+            {
+                MessageBox.Show("ERROR: x and y data have different lengths (" + x.ToArray().Length + " and " + y.ToArray().Length + ")", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (reset)
+            {
+                plot.Reset();
+            }
+
+            if (!string.IsNullOrEmpty(seriesName))
+            {
+                seriesNames.Add(seriesName);
+            }
+
+            seriesValues.Add(y.ToArray());
+
+            plot.plt.PlotBarGroups(groupLabels: x.ToArray(), seriesLabels: seriesNames.ToArray(), seriesValues.ToArray());
+            plot.plt.YLabel(yLabel);
+            plot.plt.XLabel(xLabel);
+            plot.plt.Grid(enableVertical: false, enableHorizontal: true, lineStyle: LineStyle.Dot);
+            if (yMin != 0 || yMax != 0)
+            {
+                plot.plt.Axis(y1: yMin, y2: yMax);
+            }
+
+            if (seriesNames.Count > 0)
+            {
+                plot.plt.Legend(location: legendLocation.upperRight);
+            }
 
             plot.Render();
         }

@@ -47,7 +47,7 @@ namespace RaceTracker.Analysis
                         label = "Favourites Finishing in Position " + this.ViewModel.Model.Position + " (%)";
                     }
 
-                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, false, string.Empty, string.Empty, label);
+                    this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, false, string.Empty, string.Empty, new List<string>(), label);
                     break;
                 }
 
@@ -65,6 +65,7 @@ namespace RaceTracker.Analysis
                     {
                         yLabel = "Probability of Favourite Finishing in Position " + this.ViewModel.Model.Position + " (%)";
                     }
+
                     this.Plotting.PlotBar(this.ViewModel.View.FavouriteVsRaceTypePlot, set.Key, set.Value, true, "Race Type", yLabel);
                     break;
                 }
@@ -252,7 +253,7 @@ namespace RaceTracker.Analysis
             this.NumberRaceCoursesData = CommonAnalyses.RetrieveNumberRaceCoursesData(this.ViewModel.Model.TimeResolutionField, this.ViewModel.Model.MinDate, this.ViewModel.Model.MaxDate);
             foreach (var set in NumberRaceCoursesData)
             {
-                this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, true, string.Empty, string.Empty, "Number of Race Courses Running");
+                this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouritePlot, set.Key, set.Value, true, string.Empty, string.Empty, new List<string>(), "Number of Race Courses Running");
             }
         }
 
