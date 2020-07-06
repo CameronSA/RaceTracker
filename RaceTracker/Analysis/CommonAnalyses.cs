@@ -15,6 +15,7 @@ namespace RaceTracker.Analysis
         public static Dictionary<List<DateTime>, List<double>> NumberRaceCoursesData { get; private set; } = new Dictionary<List<DateTime>, List<double>>();
 
         public static Dictionary<int, int> NumberOfDaysWithGivenNumberOfRaceCourses { get; private set; } = new Dictionary<int, int>(); //Key: number race courses. Value: days
+        public static Dictionary<string,Tuple<List<DateTime>,List<double>>> NumberRaceTypePerDay { get; private set; } //Key: race type value: number of occurances per day
 
         public static DateTime MinDataDate { get; private set; }
         public static DateTime MaxDataDate { get; private set; }
@@ -61,6 +62,97 @@ namespace RaceTracker.Analysis
                     CommonAnalyses.NumberOfDaysWithGivenNumberOfRaceCourses.Add(i, result);
                 }
             }
+
+            CommonAnalyses.NumberRaceTypePerDay = CommonAnalyses.GetRaceTypesVsTime(MinDataDate, MaxDataDate);
+        }
+
+        public static Dictionary<string, Tuple<List<DateTime>, List<double>>> GetRaceTypesVsTime(DateTime minDate, DateTime maxDate)
+        {
+            var relevantColumns = new List<Tuple<DateTime, DateTime, string>>();
+            var dates = new List<DateTime>();
+            var times = new List<DateTime>();
+            var raceTypes = new List<string>();
+
+            foreach (var column in Data.ProcessedRaceData)
+            {
+                if (column.Key.ToLower().Trim() == "date")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        dates.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower().Trim() == "time")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        times.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower().Trim() == "race type")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        raceTypes.Add((string)item);
+                    }
+                }
+            }
+
+            for (int i = 0; i < dates.Count; i++)
+            {
+                relevantColumns.Add(new Tuple<DateTime, DateTime, string>(dates[i], times[i], raceTypes[i]));
+            }
+
+            var raceTypeNumberPerDay = new Dictionary<string, Dictionary<string, double>>(); // key: type value: dictionary of time and number of type
+            foreach(var row in relevantColumns)
+            {
+                string dateString = row.Item1 + "," + row.Item2;
+                if (raceTypeNumberPerDay.ContainsKey(row.Item3))
+                {
+                    if(raceTypeNumberPerDay[row.Item3].ContainsKey(dateString))
+                    {
+                        raceTypeNumberPerDay[row.Item3][dateString] = raceTypeNumberPerDay[row.Item3][dateString] + 1;
+                    }
+                    else
+                    {
+                        raceTypeNumberPerDay[row.Item3].Add(dateString, 1);
+                    }
+                }
+                else
+                {
+                    raceTypeNumberPerDay.Add(row.Item3, new Dictionary<string, double>() { { dateString, 1 } });
+                };
+            }
+
+            var results = new Dictionary<string, Tuple<List<DateTime>, List<double>>>();
+            foreach(var raceType in raceTypeNumberPerDay)
+            {
+                var raceTypeNumbers = new Dictionary<DateTime, double>();
+                foreach(var dateString in raceType.Value)
+                {
+                    var date = DateTime.Parse(dateString.Key.Split(new char[] { ',' })[0]);
+                    if (raceTypeNumbers.ContainsKey(date))
+                    {
+                        raceTypeNumbers[date] = raceTypeNumbers[date] + dateString.Value;
+                    }
+                    else
+                    {
+                        raceTypeNumbers.Add(date, dateString.Value);
+                    }
+                }
+
+                var dateList = new List<DateTime>();
+                var numberList = new List<double>();
+                foreach(var item in raceTypeNumbers)
+                {
+                    dateList.Add(item.Key);
+                    numberList.Add(item.Value);
+                }
+
+                results.Add(raceType.Key, new Tuple<List<DateTime>, List<double>>(dateList, numberList));
+            }
+
+            return results;
         }
 
         public static Dictionary<List<string>, List<double>> GetNumberRaceTypes(DateTime minDate, DateTime maxDate)
@@ -101,48 +193,6 @@ namespace RaceTracker.Analysis
             }
 
             return GetNumberRaceTypes(relevantColumns, minDate, maxDate);
-
-            //foreach (var column in Data.ProcessedRaceData)
-            //{
-            //    if(column.Key.ToLower().Trim() == "date")
-            //    {
-            //        for (int i = 0; i < column.Value.Data.Length; i++)
-            //        {
-            //            var date = (DateTime)column.Value.Data[i];
-            //            if (date >= minDate && date <= maxDate)
-            //            {
-            //                raceTypeIndices.Add(i);
-            //            }
-            //        }
-            //    }
-            //}
-
-            //foreach (var column in Data.ProcessedRaceData)
-            //{
-            //    if (column.Key.ToLower().Trim() == "race type")
-            //    {
-            //        foreach(var index in raceTypeIndices)
-            //        {
-            //            var raceType = (string)column.Value.Data[index];
-            //            if (raceTypesCount.ContainsKey(raceType))
-            //            {
-            //                raceTypesCount[raceType] = raceTypesCount[raceType] + 1;
-            //            }
-            //            else
-            //            {
-            //                raceTypesCount.Add(raceType, 1);
-            //            }
-            //        }
-            //    }
-            //}
-
-            //foreach (var item in raceTypesCount)
-            //{
-            //    raceTypes.Add(item.Key);
-            //    counts.Add(item.Value);
-            //}
-
-            //return new Dictionary<List<string>, List<double>> { { raceTypes, counts } };
         }
 
         private static Dictionary<List<string>, List<double>> GetNumberRaceTypes(List<Tuple<DateTime, DateTime, string>> rows, DateTime minDate, DateTime maxDate)

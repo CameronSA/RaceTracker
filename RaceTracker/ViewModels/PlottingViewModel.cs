@@ -89,6 +89,33 @@ namespace RaceTracker.ViewModels
                 new Plotting().PlotBar(this.View.NumberRaceTypes, set.Key, set.Value, true, "Race Type", "Count");
                 break;
             }
+
+            this.NumberRaceTypePerDay(data);
+        }
+
+        private void NumberRaceTypePerDay(Dictionary<List<string>, List<double>> raceTypeTotals)
+        {
+            var data = CommonAnalyses.NumberRaceTypePerDay;
+            var seriesNames = new List<string>();
+            bool reset = true;
+            foreach (var set in data)
+            {
+                foreach (var raceTypeTotal in raceTypeTotals)
+                {
+                    string series = set.Key;
+                    var raceTypeIndex = raceTypeTotal.Key.IndexOf(series);
+                    var total = raceTypeTotal.Value[raceTypeIndex];
+                    var percentages = new List<double>();
+                    foreach (var point in set.Value.Item2)
+                    {
+                        percentages.Add(100 * point / total);
+                    }
+
+                    new Plotting().PlotTimeSeries(this.View.NumberRaceTypePerDay, set.Value.Item1, percentages, reset, string.Empty, "Number of Occurances as a Percentage\nof the Total for that Race Type", seriesNames, series);
+                    reset = false;
+                    break;
+                }
+            }
         }
 
         private List<string> PopulateDataHeaders()

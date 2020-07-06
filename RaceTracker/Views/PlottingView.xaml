@@ -240,8 +240,7 @@
                     <WpfPlot Grid.Column="0" Grid.Row="0" Name="NumberRaceTracksPerDay"/>
                     <WpfPlot Grid.Column="1" Grid.Row="0" Name="NumberRaceTracksPerDayCount"/>
                     <WpfPlot Grid.Column="0" Grid.Row="1" Name="NumberRaceTypes"/>
-                    <WpfPlot Grid.Column="1" Grid.Row="1" Name="NumberRaceTypesPerDay"/>
-                    <TextBlock Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Number of race types split by season/Race types by day" FontSize="20" TextWrapping="Wrap"/>
+                    <WpfPlot Grid.Column="1" Grid.Row="1" Name="NumberRaceTypePerDay"/>
                 </Grid>
             </TabItem>
         </TabControl>        
