@@ -26,6 +26,20 @@ namespace RaceTracker.Models
         private bool splitByPosition;
         private string minOdds;
         private string maxOdds;
+        private string numberBins;
+
+        public string NumberBins
+        {
+            get
+            {
+                return this.numberBins;
+            }
+            set
+            {
+                this.numberBins = value;
+                this.OnPropertyChanged("NumberBins");
+            }
+        }
 
         public string MinOdds
         { 

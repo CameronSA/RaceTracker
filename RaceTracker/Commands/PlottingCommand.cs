@@ -31,7 +31,13 @@ namespace RaceTracker.Commands
                 case "btDailyProfileGo":
                     canExecute = true;
                     break;
-                case "btOddsGo":
+                case "btProbabilityOddsGo":
+                    canExecute = true;
+                    break;
+                case "btRaceTypePerDayGo":
+                    canExecute = true;
+                    break;
+                case "btOddsProbabilityGo":
                     canExecute = true;
                     break;
             }
@@ -51,9 +57,16 @@ namespace RaceTracker.Commands
                     var dailyRaceProfile = new DailyRaceProfile(this.ViewModel);
                     dailyRaceProfile.PlotDailyRaceProfile();
                     break;
-                case "btOddsGo":
-                    var odds = new OddsProfile(this.ViewModel);
+                case "btProbabilityOddsGo":
+                    var odds = new ProbabilityOfOddsProfile(this.ViewModel);
                     odds.PlotOddsProfile();
+                    break;
+                case "btRaceTypePerDayGo":
+                    this.ViewModel.NumberRaceTypePerDay();
+                    break;
+                case "btOddsProbabilityGo":
+                    var oddsProbability = new OddsProbabilityProfile(this.ViewModel);
+                    oddsProbability.PlotOddsProbabilityProfile();
                     break;
             }
         }    

@@ -3,6 +3,7 @@ using RaceTracker.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Threading.Tasks;
@@ -64,6 +65,38 @@ namespace RaceTracker.Analysis
             }
 
             CommonAnalyses.NumberRaceTypePerDay = CommonAnalyses.GetRaceTypesVsTime(MinDataDate, MaxDataDate);
+        }
+
+        public static Tuple<List<DateTime>, List<double>, List<double>, int> BinData(List<Tuple<DateTime, double>> timeSeriesData, int numberBins)
+        {
+            int datesPerBin = (int)Math.Ceiling((double)timeSeriesData.Count / (double)numberBins);
+            var binnedDates = new List<DateTime>();
+            var averages = new List<double>();
+            var averagesError = new List<double>();
+            for (int i = 0; i < timeSeriesData.Count; i += datesPerBin)
+            {
+                var values = new List<double>();
+                for (int n = i; n < i + datesPerBin; n++)
+                {
+                    if (n < timeSeriesData.Count)
+                    {
+                        values.Add(timeSeriesData[n].Item2);
+                    }
+                }
+
+                if (values.Count > 0)
+                {
+                    var average = values.Average();
+                    var sumSquares = values.Sum(x => (x - average) * (x - average));
+                    var stdDev = Math.Sqrt(sumSquares);
+
+                    binnedDates.Add(timeSeriesData[i].Item1);
+                    averages.Add(average);
+                    averagesError.Add(stdDev);
+                }
+            }
+
+            return new Tuple<List<DateTime>, List<double>, List<double>, int>(binnedDates, averages, averagesError, datesPerBin);
         }
 
         public static Dictionary<string, Tuple<List<DateTime>, List<double>>> GetRaceTypesVsTime(DateTime minDate, DateTime maxDate)

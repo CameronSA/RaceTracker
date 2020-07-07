@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using System.Windows.Forms;
 
 namespace RaceTracker.Analysis
 {
-    public class OddsProfile
+    public class ProbabilityOfOddsProfile
     {
-        public OddsProfile(PlottingViewModel viewModel)
+        public ProbabilityOfOddsProfile(PlottingViewModel viewModel)
         {
             this.ViewModel = viewModel;
             this.Plotting = new Plotting();
@@ -36,7 +37,14 @@ namespace RaceTracker.Analysis
                     this.ProbabilityOfFavouritesHavingOddRange(minOdds, maxOdds);
                     this.ProbabilityOfFavouriteWithOddsWinningRaceType(position, minOdds, maxOdds);
                     this.ProbabilityOfOddRangesWinningVsTime(position, minOdds, maxOdds);
-                    this.FavouriteOddsVsTime();
+                    if (int.TryParse(this.ViewModel.Model.NumberBins, out int numberBins) && Math.Abs(numberBins) > 0)
+                    {
+                        this.FavouriteOddsVsTime(this.ViewModel.Model.ResetIndividual, Math.Abs(numberBins));
+                    }
+                    else
+                    {
+                        MessageBox.Show("ERROR: Number of bins must be an integer!", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
                 else
                 {
@@ -449,9 +457,73 @@ namespace RaceTracker.Analysis
             }
         }
 
-        private void FavouriteOddsVsTime()
-        { 
-        
+        private void FavouriteOddsVsTime(bool reset, int numberBins)
+        {
+            var rows = new List<Tuple<DateTime, DateTime, double, string>>();
+            var expectations = new List<string>();
+            var dates = new List<DateTime>();
+            var times = new List<DateTime>();
+            var odds = new List<double>();
+            foreach (var column in Data.ProcessedRaceData)
+            {
+                if (column.Key.ToLower() == "date")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        dates.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower() == "time")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        times.Add((DateTime)item);
+                    }
+                }
+                else if (column.Key.ToLower() == "expectation")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        expectations.Add((string)item);
+                    }
+                }
+                else if (column.Key.ToLower() == "isp")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        odds.Add(double.Parse(item.ToString()));
+                    }
+                }
+            }
+
+            for (int i = 0; i < dates.Count; i++)
+            {
+                rows.Add(new Tuple<DateTime, DateTime, double, string>(dates[i], times[i], odds[i], expectations[i]));
+            }
+
+            var oddsList = new List<double>();
+            var dateList = new List<DateTime>();
+            var oddsVsTime = new List<Tuple<DateTime, double>>();
+            foreach(var row in rows)
+            {
+                if (row.Item4.Trim().ToLower() == "f")
+                {
+                    var date = new DateTime(row.Item1.Year, row.Item1.Month, row.Item1.Day, row.Item2.Hour, row.Item2.Minute, row.Item2.Second);                    
+                    oddsList.Add(row.Item3);
+                    dateList.Add(date);
+                    oddsVsTime.Add(new Tuple<DateTime, double>(date, row.Item3));
+                }
+            }
+
+            if (numberBins < oddsVsTime.Count)
+            {
+                var binnedData = CommonAnalyses.BinData(oddsVsTime, numberBins);
+                this.Plotting.PlotTimeSeriesError(this.ViewModel.View.FavouriteOddsVsTime, binnedData.Item1, binnedData.Item2, binnedData.Item3, reset, string.Empty, "Average Favourite Odds", new List<string>(), "# Bins: " + numberBins + "\nBin Size: " + binnedData.Item4);
+            }
+            else
+            {
+                this.Plotting.PlotTimeSeries(this.ViewModel.View.FavouriteOddsVsTime, dateList, oddsList, reset, string.Empty, "Favourite Odds", new List<string>(), "Unbinned");
+            }
         }
     }
 }

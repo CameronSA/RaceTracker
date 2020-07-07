@@ -61,6 +61,55 @@ namespace RaceTracker.Analysis
             plot.Render();
         }
 
+        public void PlotTimeSeriesError(WpfPlot plot, IEnumerable<DateTime> x, IEnumerable<double> y, IEnumerable<double> yError, bool reset, string xLabel, string yLabel, List<string> seriesList, string seriesName)
+        {
+            if (x.ToArray().Length < 1 || y.ToArray().Length < 1)
+            {
+                return;
+            }
+
+            if (x.ToArray().Length != y.ToArray().Length)
+            {
+                MessageBox.Show("ERROR: x and y data have different lengths (" + x.ToArray().Length + " and " + y.ToArray().Length + ")", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if(y.ToArray().Length != yError.ToArray().Length)
+            {
+                MessageBox.Show("ERROR: y and yError data have different lengths (" + y.ToArray().Length + " and " + yError.ToArray().Length + ")", AppSettings.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (reset)
+            {
+                plot.Reset();
+            }
+
+            var xNumeric = new List<double>();
+            foreach (var item in x)
+            {
+                xNumeric.Add(item.ToOADate());
+            }
+
+            if (!string.IsNullOrEmpty(seriesName))
+            {
+                seriesList.Add(seriesName);
+            }
+
+            plot.plt.PlotScatter(xNumeric.ToArray(), y.ToArray(), lineWidth: 0, label: seriesName, markerSize: this.MarkerSize, errorY: yError.ToArray());
+            plot.plt.Ticks(dateTimeX: true);
+            plot.plt.XLabel(xLabel);
+            plot.plt.YLabel(yLabel);
+            plot.plt.AxisAuto();
+
+            if (seriesList.Count > 0)
+            {
+                plot.plt.Legend(location: legendLocation.upperRight);
+            }
+
+            plot.Render();
+        }
+
         public void PlotScatter(WpfPlot plot, IEnumerable<double> x, IEnumerable<double> y, bool reset, string xLabel, string yLabel, List<string> seriesNames, string seriesName, double? xLower = null, double? xUpper = null, double? yLower = null, double? yUpper = null)
         {
             if (x.ToArray().Length < 1 || y.ToArray().Length < 1)
