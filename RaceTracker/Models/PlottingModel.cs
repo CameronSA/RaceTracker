@@ -249,7 +249,7 @@ namespace RaceTracker.Models
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(object property)
+        private void OnPropertyChanged(object property)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property.ToString()));
         }

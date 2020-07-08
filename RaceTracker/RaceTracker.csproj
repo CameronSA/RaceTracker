@@ -99,6 +99,7 @@
     <Compile Include="Analysis\ProbabilityOfOddsProfile.cs" />
     <Compile Include="Analysis\Plotting.cs" />
     <Compile Include="Commands\PlottingCommand.cs" />
+    <Compile Include="Commands\StrategiesCommand.cs" />
     <Compile Include="LogicHelpers\AppSettings.cs" />
     <Compile Include="LogicHelpers\CommandLine.cs" />
     <Compile Include="LogicHelpers\Data.cs" />
@@ -107,8 +108,11 @@
     <Compile Include="LogicHelpers\UnitConversions.cs" />
     <Compile Include="Models\NormalisingFactors.cs" />
     <Compile Include="Models\PlottingModel.cs" />
+    <Compile Include="Models\StrategiesModel.cs" />
     <Compile Include="Models\TimeResolutionFields.cs" />
+    <Compile Include="Strategies\Strategy1.cs" />
     <Compile Include="ViewModels\PlottingViewModel.cs" />
+    <Compile Include="ViewModels\StrategiesViewModel.cs" />
     <Compile Include="Views\DataView.xaml.cs">
       <DependentUpon>DataView.xaml</DependentUpon>
     </Compile>
@@ -120,6 +124,9 @@
     </Compile>
     <Compile Include="Views\PlottingView.xaml.cs">
       <DependentUpon>PlottingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StrategiesView.xaml.cs">
+      <DependentUpon>StrategiesView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -146,6 +153,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PlottingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StrategiesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

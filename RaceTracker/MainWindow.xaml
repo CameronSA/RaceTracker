@@ -14,6 +14,9 @@
             <TabItem Header="Home">
                 <Views:HomeView/>
             </TabItem>
+            <TabItem Header="Strategies">
+                <Views:StrategiesView/>
+            </TabItem>
             <TabItem Header="Analysis">
                 <Views:PlottingView/>
             </TabItem>
