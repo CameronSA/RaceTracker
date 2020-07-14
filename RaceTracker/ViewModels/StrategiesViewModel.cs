@@ -19,7 +19,7 @@ namespace RaceTracker.ViewModels
             var raceTypes = this.GetRaceTypes();
             var months = this.GetMonths();
 
-            this.Model = new StrategiesModel
+            this.Model = new StrategiesModel(this)
             {
                 Bank = "5000",
                 DailyPotPercentage = "10",
@@ -30,18 +30,49 @@ namespace RaceTracker.ViewModels
                 MaxOdds = "3",
                 RaceTypes = raceTypes,
                 RaceType = raceTypes[0],
-                Months = months,
-                Month = months[0],
+                MonthlyDays = new List<string>(),
                 Year = DateTime.Today.Year.ToString(),
             };
 
+            this.Model.Months = months;
+            this.Model.Month = months[0];
+            this.Model.MonthlyDay = this.Model.MonthlyDays[0];
+
             this.View = view;
             this.Command = new StrategiesCommand(this);
+            this.FixedYear = -1;
         }
 
         public StrategiesModel Model { get; }
         public StrategiesView View { get; }
-        public ICommand Command { get; }
+        public StrategiesCommand Command { get; }
+        public int FixedYear { get; set; }
+
+        public void DisplayDailyBreakdown()
+        {
+            if (FixedYear > 0)
+            {
+                // Key: Day. Value: item1: race time, item2: bet, item3: odds, item4: result item5: net winnings for that race
+                Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>> reports = this.Command.Strategy1DailyReports;
+
+                foreach (var report in reports)
+                {
+                    if (report.Key.Year == FixedYear && report.Key.Month == UnitConversions.MonthNumber(this.Model.Month) && report.Key.Day == int.Parse(this.Model.MonthlyDay))
+                    {
+                        this.Model.Strategy1DailyBreakdownTitle = "Daily Breakdown for " + report.Key.Day + " " + UnitConversions.MonthName(report.Key.Month) + " " + report.Key.Year;
+                        this.Model.Strategy1DailyBreakdown = "Time\tBet (£)\tOdds\tResult\tWinnings (£)\n";
+                        this.Model.Strategy1DailyBreakdown += "================================\n";
+                        foreach(var line in report.Value)
+                        {
+                            string win = line.Item4 ? "Win" : "Loss";
+                            this.Model.Strategy1DailyBreakdown += Formatting.EditStringLength(line.Item1.Hour.ToString(), 2) + ":" + Formatting.EditStringLength(line.Item1.Minute.ToString(), 2) + "\t" + line.Item2 + "\t" + Math.Round(line.Item3, 2) + "\t" + win + "\t" + line.Item5 + "\n";
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
 
         public bool VerifyInputs()
         {

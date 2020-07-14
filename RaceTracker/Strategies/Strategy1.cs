@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace RaceTracker.Strategies
 {
@@ -73,168 +74,187 @@ namespace RaceTracker.Strategies
                 dataRows.Add(new Tuple<DateTime, DateTime, string, int, string, double>(dates[i], times[i], raceTypes[i], positions[i], expectations[i], odds[i]));
             }
 
-            var raceOutcomesDictionary = new Dictionary<DateTime, Tuple<string, double, bool>>(); //Date, race type, odds, winner
-            foreach(var row in dataRows)
+            var dailyRaces = new Dictionary<DateTime, Dictionary<DateTime, List<Tuple<string, int, string, double>>>>(); //Key: Date. Value: dictionary of race type, position, expectation and odds for each race time
+            foreach (var row in dataRows)
             {
-                if (row.Item4 == 1 )
+                if (dailyRaces.ContainsKey(row.Item1))
                 {
-                    var date = new DateTime(row.Item1.Year, row.Item1.Month, row.Item1.Day, row.Item2.Hour, row.Item2.Minute, row.Item2.Second);
-                    if (raceOutcomesDictionary.ContainsKey(date))
+                    if(dailyRaces[row.Item1].ContainsKey(row.Item2))
                     {
-                        //MessageBox.Show("WARNING: Duplicate Outcome found on date '" + date + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Warning);
-                        if (row.Item5.ToLower().Trim() == "f")
-                        {
-                            raceOutcomesDictionary[date] = new Tuple<string, double, bool>(row.Item3, row.Item6, true);
-                        }
+                        dailyRaces[row.Item1][row.Item2].Add(new Tuple<string, int, string, double>(row.Item3, row.Item4, row.Item5, row.Item6));
                     }
                     else
                     {
-                        raceOutcomesDictionary.Add(date, new Tuple<string, double, bool>(row.Item3, row.Item6, row.Item5.ToLower().Trim() == "f"));
+                        dailyRaces[row.Item1].Add(row.Item2, new List<Tuple<string, int, string, double>> { new Tuple<string, int, string, double>(row.Item3, row.Item4, row.Item5, row.Item6) });
                     }
+                }
+                else
+                {
+                    dailyRaces.Add(row.Item1, new Dictionary<DateTime, List<Tuple<string, int, string, double>>> { { row.Item2, new List<Tuple<string, int, string, double>> { new Tuple<string, int, string, double>(row.Item3, row.Item4, row.Item5, row.Item6) } } });
                 }
             }
 
-            var unorderedRaceOutcomes = new List<Tuple<DateTime, string, double, bool>>();
-            foreach (var item in raceOutcomesDictionary)
-            {
-                unorderedRaceOutcomes.Add(new Tuple<DateTime, string, double, bool>(item.Key, item.Value.Item1, item.Value.Item2, item.Value.Item3));
-            }
-
-            this.RaceOutcomes = unorderedRaceOutcomes.OrderBy(x => x.Item1).ToArray();
+            this.DailyRaceOutcomes = dailyRaces;
             this.DailyReports = new Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>>();
         }
 
-        public Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>> DailyReports { get; private set; } // Key: Day. Value: item1: race time, item2: bet, item3: odds, item4: result item5: winnings
+        public Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>> DailyReports { get; private set; } // Key: Day. Value: item1: race time, item2: bet, item3: odds, item4: result item5: net winnings for that race
 
         private StrategiesViewModel ViewModel { get; }
 
-        private Tuple<DateTime, string, double, bool>[] RaceOutcomes; // Item1: Date & Time of race (in chronological order). Item2: race type. Item3: odds Item4: Winner
+        private Dictionary<DateTime, Dictionary<DateTime, List<Tuple<string, int, string, double>>>> DailyRaceOutcomes; //Key: Date. Value: dictionary of race type, position, expectation and odds for each race time
 
-        //Returns a tuple containing the winnings (item1) and the max bet (item2) for each day
-        public Dictionary<DateTime, Tuple<double, double>> CalculateDailyProfitForYear()
+        //Returns a tuple containing the total bet (item1) and the winnings (item2) for each day
+        public Dictionary<DateTime, Tuple<double, double>> CalculateDailyProfits()
         {
-            double totalWin = double.Parse(this.ViewModel.Model.TotalWinValue.Replace("£", string.Empty));
-            double minOdds = double.Parse(this.ViewModel.Model.MinOdds);
-            double maxOdds = double.Parse(this.ViewModel.Model.MaxOdds);
-            int year = int.Parse(this.ViewModel.Model.Year);
-            int raceCutoff = int.Parse(this.ViewModel.Model.RaceCutoff);
-            double lossCutoff = int.Parse(this.ViewModel.Model.PriceCutoffValue.Replace("£", string.Empty));
-
-            var dailyProfiles = new Dictionary<DateTime, List<Tuple<DateTime, string, double, bool>>>(); //Key: Day. Value: List of race outcomes for that day in chronological order (time + race type + odds of favourite + winner)
-            foreach (var outcome in RaceOutcomes)
+            var returnValue = new Dictionary<DateTime, Tuple<double, double>>();
+            // Filter by day
+            foreach (var day in this.DailyRaceOutcomes)
             {
-                if (outcome.Item1.Year == year)
+                // Filter by race
+                var raceOutcomes = new List<Tuple<DateTime, double, bool, bool>>(); // race time, favourite odds, race bet on, race won
+                foreach(var race in day.Value)
                 {
-                    var day = new DateTime(outcome.Item1.Year, outcome.Item1.Month, outcome.Item1.Day);
-                    var time = outcome.Item1;
-
-                    if (dailyProfiles.ContainsKey(day))
+                    //Filter by race result to get a list of results for that race
+                    var raceResultList = new List<Tuple<DateTime, string, int, string, double>>(); // race time, race type, position, expectation, odds 
+                    foreach (var raceResult in race.Value)
                     {
-                        dailyProfiles[day].Add(new Tuple<DateTime, string, double, bool>(time, outcome.Item2, outcome.Item3, outcome.Item4));
+                        raceResultList.Add(new Tuple<DateTime, string, int, string, double>(race.Key, raceResult.Item1, raceResult.Item2, raceResult.Item3, raceResult.Item4));
                     }
-                    else
-                    {
-                        dailyProfiles.Add(day, new List<Tuple<DateTime, string, double, bool>> { new Tuple<DateTime, string, double, bool>(time, outcome.Item2, outcome.Item3, outcome.Item4) });
-                    }
-                }
-            }
 
-            var dailyProfits = new Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>>(); // Key: Day. Value: item1: race time, item2: bet, item3: odds, item4: result item5: winnings
-            var dailySummary = new Dictionary<DateTime, Tuple<double, double>>(); // Key: Day. Value: item1: winnings, item2: max bet
-
-            foreach (var day in dailyProfiles)
-            {
-                int raceCount = 0;
-                double previousBets = 0;
-                bool lost = false;
-                foreach (var race in day.Value)
-                {
-                    var betOutcome = new Tuple<DateTime, double, double, bool, double>(race.Item1, 0, race.Item3, race.Item4, 0);  // race time, bet, odds, result, winnings
-                    if ((race.Item2.Trim() == this.ViewModel.Model.RaceType.Trim() || this.ViewModel.Model.RaceType.Trim() == "All") && race.Item3 >= minOdds && race.Item3 <= maxOdds) // If race satisfies user input filters
+                    bool outcomeFound = false;
+                    var raceTime = new DateTime();
+                    bool raceWon = false;
+                    bool betOnRace = false;
+                    foreach (var raceResult in raceResultList)
                     {
-                        if (raceCount <= raceCutoff || previousBets >= lossCutoff)
+                        raceTime = raceResult.Item1;
+                        // Find the favourite and note its odds, whether or not it won, and whether to bet on it (in principle) based on user input filters (race type + odds)                         
+                        if (raceResult.Item4.ToLower().Trim() == "f")
                         {
-                            double requiredWinnings = totalWin + previousBets; // Required winnings is whatever we want to win for the day + sum of losing bets up to this point
+                            //if (day.Key.Year == 2018 && day.Key.Month == 8 && day.Key.Day == 17)
+                            //{
+                            //    MessageBox.Show("outside loop" + raceResult.Item1 + " " + raceResult.Item2 + " " + raceResult.Item3 + " " + raceResult.Item4 + " " + raceResult.Item5);
+                            //}
 
-                            double bet = requiredWinnings / race.Item3; // Required bet is the required winnings divided by the odds of that race
-
-                            if (previousBets + bet > lossCutoff)
+                            // Check position
+                            if (raceResult.Item3 == 1)
                             {
-                                lost = true;
-                                break;
+                                //if (day.Key.Year == 2018 && day.Key.Month == 8 && day.Key.Day == 17)
+                                //{
+                                //    MessageBox.Show(raceResult.Item1 + " " + raceResult.Item2 + " " + raceResult.Item3 + " " + raceResult.Item4 + " " + raceResult.Item5);
+                                //}
+
+                                raceWon = true;
                             }
 
-                            previousBets += bet;
-                            double winnings = race.Item4 ? requiredWinnings : 0;
-                            betOutcome = new Tuple<DateTime, double, double, bool, double>(race.Item1, bet, race.Item3, race.Item4, winnings);
-                            if (race.Item4) // If we win, we get back our initial bet + winnings and stop betting for that day
+                            // Filter on race type
+                            if (raceResult.Item2.ToLower().Trim() == this.ViewModel.Model.RaceType.ToLower().Trim() || this.ViewModel.Model.RaceType.ToLower().Trim() == "all")
                             {
-                                break;
+                                // Filter on odds
+                                if (raceResult.Item5 >= double.Parse(this.ViewModel.Model.MinOdds) && raceResult.Item5 <= double.Parse(this.ViewModel.Model.MaxOdds))
+                                {
+                                    // If all the filters passed, the race is worth betting on
+                                    betOnRace = true;
+                                }
                             }
 
-                            raceCount++;
-                        }
-                        else
-                        {
-                            lost = true;
+                            raceOutcomes.Add(new Tuple<DateTime, double, bool, bool>(raceResult.Item1, raceResult.Item5, betOnRace, raceWon));
+                            outcomeFound = true;
                             break;
                         }
                     }
 
-                    if (dailyProfits.ContainsKey(day.Key))
+                    if (!outcomeFound)
                     {
-                        //MessageBox.Show("ERROR: Duplicate daily profits found", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
-                        dailyProfits[day.Key].Add(betOutcome);
-                    }
-                    else
-                    {
-                        dailyProfits.Add(day.Key, new List<Tuple<DateTime, double, double, bool, double>> { betOutcome });
+                        // If there is no favourite (joint favourite instead for example), don't bet
+                        raceOutcomes.Add(new Tuple<DateTime, double, bool, bool>(raceTime, 0, false, false)); ;
                     }
                 }
 
-                double totalWinnings;
-                if (lost)
+                // Calculate winnings based on daily race outcomes
+                var bettingOutcome = this.CalculateDailyWinnings(day.Key, raceOutcomes);
+                if (returnValue.ContainsKey(day.Key))
                 {
-                    totalWinnings = -previousBets;
+                    MessageBox.Show("ERROR: Duplicate daily profits found for date '" + day.Key + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else
                 {
-                    totalWinnings = totalWin;
-                }
-
-                if (dailySummary.ContainsKey(day.Key))
-                {
-                    MessageBox.Show("ERROR: Duplicate daily summaries found", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                else
-                {
-                    dailySummary.Add(day.Key, new Tuple<double, double>(totalWinnings, previousBets));
+                    returnValue.Add(day.Key, bettingOutcome);
                 }
             }
 
-            this.DailyReports = dailyProfits;
-
-            return dailySummary;
+            return returnValue;
         }
 
-        private int GetMonth(string monthName)
+        // Input: date, list of tuples of race time, odds, bet on race, race won (for that day). Output: total bet and winnings
+        private Tuple<double, double> CalculateDailyWinnings(DateTime day, List<Tuple<DateTime, double, bool, bool>> raceOutcomes)
         {
-            switch (monthName.ToLower().Substring(0, 3))
+            var raceOutcomesArray = raceOutcomes.OrderBy(x => x.Item1).ToArray();
+            double totalWinningsRequirement = double.Parse(this.ViewModel.Model.TotalWinValue.Replace("£", string.Empty));
+            double dailyPot = double.Parse(this.ViewModel.Model.DailyPotValue.Replace("£", string.Empty));
+            double totalBet = 0;
+            var dailyBettingProfile = new List<Tuple<DateTime, double, double, bool, double>>(); // race time, bet, odds, result, net winnings for that race
+            int numberRacesCutoff = int.Parse(this.ViewModel.Model.RaceCutoff);
+            double lossCutoff = double.Parse(this.ViewModel.Model.PriceCutoffValue.Replace("£", string.Empty));
+            int numberRacesPassed = 0;
+            bool raceWon = false;
+            double actualWinnings = 0;
+            foreach (var raceOutcome in raceOutcomesArray)
             {
-                case "jan": return 1;
-                case "feb": return 2;
-                case "mar": return 3;
-                case "apr": return 4;
-                case "may": return 5;
-                case "jun": return 6;
-                case "jul": return 7;
-                case "aug": return 8;
-                case "sep": return 9;
-                case "oct": return 10;
-                case "nov": return 11;
-                case "dec": return 12;
-                default: MessageBox.Show("ERROR: Could not parse date with month '" + monthName + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
-                    throw new Exception();
+                double odds = raceOutcome.Item2;
+                double betRequirement = (totalWinningsRequirement + totalBet) / odds;
+                if (raceOutcome.Item3)
+                {
+                    // If the number of races cutoff or the loss cutoff is reached, we stop betting
+                    if (numberRacesPassed >= numberRacesCutoff || totalBet + betRequirement > lossCutoff)
+                    {
+                        break;
+                    }
+
+                    double totalBetMinusLastBet = totalBet;
+                    // if the race is a betting candidate, add the bet to the total bet to be taken into account for the next race in the event of a loss
+                    totalBet += betRequirement;
+                    double roundedBetRequirement = Math.Round(betRequirement, 2);
+
+                    // if the race is won, we stop betting and return the winnings
+                    if (raceOutcome.Item4)
+                    {
+                        dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(raceOutcome.Item1, roundedBetRequirement, odds, true, Math.Round((roundedBetRequirement * odds) - totalBetMinusLastBet, 2)));
+                        raceWon = true;
+                        actualWinnings = Math.Round((roundedBetRequirement * odds) - totalBetMinusLastBet, 2);
+                        break;
+                    }
+                    else
+                    {
+                        dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(raceOutcome.Item1, roundedBetRequirement, odds, false, 0));
+                    }
+
+                    numberRacesPassed++;
+                }
+                else
+                {
+                    dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(raceOutcome.Item1, 0, odds, raceOutcome.Item4, 0));
+                }
+            }
+
+            if (this.DailyReports.ContainsKey(day))
+            {
+                MessageBox.Show("ERROR: Duplicate daily reports found for date '" + day + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                this.DailyReports.Add(day, dailyBettingProfile);
+            }
+
+            double roundedTotalBet = Math.Round(totalBet, 2);
+            if (raceWon)
+            {
+                return new Tuple<double, double>(roundedTotalBet, actualWinnings);
+            }
+            else
+            {
+                return new Tuple<double, double>(roundedTotalBet, 0);
             }
         }
     }

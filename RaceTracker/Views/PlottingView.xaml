@@ -8,7 +8,45 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <TabControl>
-            <TabItem Header="Favourites By Position ">
+            <TabItem Header="Number of Favourite Wins ">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="4*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="3*"/>
+                        </Grid.RowDefinitions>
+                    <Grid Grid.Row="1" Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="4*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Odds:" FontSize="18"/>
+                        <TextBox Grid.Column="2" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.MinOdds}"/>
+                        <TextBlock Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Text="-"/>
+                        <TextBox Grid.Column="4" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" Text="{Binding Path=Model.MaxOdds}"/>
+                        </Grid>
+                        <Button Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="30 0 30 0" Content="Go" Command="{Binding Path=Command}" CommandParameter="btNumberFavouriteWinsGo"/>
+                    </Grid>
+
+                    <WpfPlot Grid.Column="1" Grid.Row="0" Name="NumberFavouriteWinsProbabilityPlot"/>
+                    <WpfPlot Grid.Column="1" Grid.Row="1" Name="NumberFavouriteWinsProbabilityFiltersPlot"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header=" Favourites By Position ">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

@@ -1,4 +1,5 @@
-﻿using RaceTracker.Strategies;
+﻿using RaceTracker.Analysis;
+using RaceTracker.Strategies;
 using RaceTracker.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,12 @@ namespace RaceTracker.Commands
         public StrategiesCommand(StrategiesViewModel viewModel)
         {
             this.ViewModel = viewModel;
+            this.Strategy1DailyReports = new Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>>();
         }
 
         private StrategiesViewModel ViewModel { get; }
+
+        public Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>> Strategy1DailyReports { get; private set; } 
 
         public event EventHandler CanExecuteChanged
         {
@@ -54,22 +58,53 @@ namespace RaceTracker.Commands
             if (this.ViewModel.VerifyInputs())
             {
                 var strategy1 = new Strategy1(this.ViewModel);
-                var dailyProfit = strategy1.CalculateDailyProfitForYear();
-                foreach (var day in strategy1.DailyReports)
-                {
-                    foreach (var race in day.Value)
-                    {
-                        this.ViewModel.Model.DisplayTime += race.Item1+"\n";
-                        this.ViewModel.Model.DisplayBet += race.Item2 + "\n";
-                        this.ViewModel.Model.DisplayOdds += race.Item3 + "\n";
-                        this.ViewModel.Model.DisplayResult += race.Item4 ? "Won\n" : "Lost\n";
-                        this.ViewModel.Model.DisplayWinnings += race.Item5 + "\n";
-                        MessageBox.Show(this.ViewModel.Model.DisplayTime + "\n" + this.ViewModel.Model.DisplayBet + "\n" + this.ViewModel.Model.DisplayOdds + "\n" + this.ViewModel.Model.DisplayResult + "\n" + this.ViewModel.Model.DisplayWinnings);
-                    }
+                var dailyBetAndWinnings = strategy1.CalculateDailyProfits();
+                this.Strategy1DailyReports = strategy1.DailyReports;
+                this.ViewModel.FixedYear = int.Parse(this.ViewModel.Model.Year);
+                var formattedData = this.GetYearlyPlotData(dailyBetAndWinnings, this.ViewModel.FixedYear);
 
-                    break;
+                this.CreateAnnualStrategy1Plot(formattedData);
+                this.ViewModel.DisplayDailyBreakdown();
+            }
+        }
+
+        // Output: Date, total bet, daily winnings
+        private List<Tuple<DateTime, double, double>> GetYearlyPlotData(Dictionary<DateTime, Tuple<double, double>> dailyBetAndWinnings, int year)
+        {
+            var yearlyData = new List<Tuple<DateTime, double, double>>(); // date, total bet, daily winnings            
+            foreach(var day in dailyBetAndWinnings)
+            {
+                if (day.Key.Year == year)
+                {
+                    if (day.Value.Item2 > 0)
+                    {
+                        yearlyData.Add(new Tuple<DateTime, double, double>(day.Key, day.Value.Item1, day.Value.Item2));
+                    }
+                    else
+                    {
+                        yearlyData.Add(new Tuple<DateTime, double, double>(day.Key, day.Value.Item1, -day.Value.Item1));
+                    }
                 }
             }
+
+            return yearlyData;
+        }
+
+        // Input: Date, total bet, daily winnings taking into account losses
+        private void CreateAnnualStrategy1Plot(List<Tuple<DateTime, double, double>> data)
+        {
+            var orderedData = data.OrderBy(x => x.Item1);
+            var dates = new List<DateTime>();
+            var totalWinnings = new List<double>();
+            double sumOfWinnings = 0;
+            foreach(var row in orderedData)
+            {
+                sumOfWinnings += row.Item3;
+                dates.Add(row.Item1);
+                totalWinnings.Add(sumOfWinnings);
+            }
+
+            new Plotting().PlotTimeSeries(this.ViewModel.View.AnnualPlotStrategy1, dates, totalWinnings, true, string.Empty, "Total Winnings (£)", new List<string>(), string.Empty);
         }
     }
 }

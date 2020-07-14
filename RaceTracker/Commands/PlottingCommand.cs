@@ -40,6 +40,9 @@ namespace RaceTracker.Commands
                 case "btOddsProbabilityGo":
                     canExecute = true;
                     break;
+                case "btNumberFavouriteWinsGo":
+                    canExecute = true;
+                    break;
             }
 
             return canExecute;
@@ -67,6 +70,10 @@ namespace RaceTracker.Commands
                 case "btOddsProbabilityGo":
                     var oddsProbability = new OddsProbabilityProfile(this.ViewModel);
                     oddsProbability.PlotOddsProbabilityProfile();
+                    break;
+                case "btNumberFavouriteWinsGo":
+                    var numberFavourites = new NumberFavouriteWins(this.ViewModel);
+                    numberFavourites.CalculateNumberFavouriteWinsVsNumberRaces(1);
                     break;
             }
         }    

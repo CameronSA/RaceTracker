@@ -1,4 +1,6 @@
-﻿using System;
+﻿using RaceTracker.LogicHelpers;
+using RaceTracker.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -19,77 +21,71 @@ namespace RaceTracker.Models
         private string raceType;
         private string month;
         private string year;
-        private string displayTime;
-        private string displayOdds;
-        private string displayBet;
-        private string displayWinnings;
-        private string displayResult;
+        private List<string> monthlyDays;
+        private string monthlyDay;
+        private string strategy1DailyBreakdown;
+        private string strategy1DailyBreakdownTitle;
+        private StrategiesViewModel viewModel;
 
-        public string DisplayTime
+        public StrategiesModel(StrategiesViewModel viewModel)
+        {
+            this.viewModel = viewModel;
+        }
+
+        public string Strategy1DailyBreakdownTitle
         {
             get
             {
-                return this.displayTime;
+                return this.strategy1DailyBreakdownTitle;
             }
             set
             {
-                this.displayTime = value;
-                this.OnPropertyChanged("DisplayTime");
+                this.strategy1DailyBreakdownTitle = value;
+                this.OnPropertyChanged("Strategy1DailyBreakdownTitle");
             }
         }
 
-        public string DisplayOdds
+        public string Strategy1DailyBreakdown
         {
             get
             {
-                return this.displayOdds;
+                return this.strategy1DailyBreakdown;
             }
             set
             {
-                this.displayOdds = value;
-                this.OnPropertyChanged("DisplayOdds");
+                this.strategy1DailyBreakdown = value;
+                this.OnPropertyChanged("Strategy1DailyBreakdown");
             }
         }
 
-        public string DisplayBet
+        public List<string> MonthlyDays
         {
             get
             {
-                return this.displayBet;
+                return this.monthlyDays;
             }
             set
             {
-                this.displayBet = value;
-                this.OnPropertyChanged("DisplayBet");
+                this.monthlyDays = value;
+                this.OnPropertyChanged("MonthlyDays");
+                this.viewModel.DisplayDailyBreakdown();
             }
         }
 
-        public string DisplayWinnings
+        public string MonthlyDay
         {
             get
             {
-                return this.displayWinnings;
+                return this.monthlyDay;
             }
             set
             {
-                this.displayWinnings = value;
-                this.OnPropertyChanged("DisplayWinnings");
+                this.monthlyDay = value;
+                this.OnPropertyChanged("MonthlyDay");
+                this.viewModel.DisplayDailyBreakdown();
             }
         }
-
-        public string DisplayResult
-        {
-            get
-            {
-                return this.displayResult;
-            }
-            set
-            {
-                this.displayResult = value;
-                this.OnPropertyChanged("DisplayResult");
-            }
-        }
-
+        
         public string Bank
         {
             get
@@ -100,9 +96,9 @@ namespace RaceTracker.Models
             {
                 this.bank = value;
                 this.OnPropertyChanged("Bank");
-                this.DailyPotValue = string.Empty;
-                this.TotalWinValue = string.Empty;
-                this.PriceCutoffValue = string.Empty;
+                this.DailyPotPercentage = this.DailyPotPercentage;
+                this.TotalWinPercentage = this.TotalWinPercentage;
+                this.PriceCutoffPercentage = this.PriceCutoffPercentage;
             }
         }
 
@@ -210,6 +206,19 @@ namespace RaceTracker.Models
             {
                 this.month = value;
                 this.OnPropertyChanged("Month");
+
+                if (int.TryParse(this.Year, out int year) && year >= DateTime.MinValue.Year && year <= DateTime.MaxValue.Year)
+                {
+                    int daysInMonth = DateTime.DaysInMonth(year, UnitConversions.MonthNumber(value));
+                    var days = new List<string>();
+                    for (int i = 1; i <= daysInMonth; i++)
+                    {
+                        days.Add(i.ToString());
+                    }
+
+                    this.MonthlyDays = days;
+                    this.viewModel.DisplayDailyBreakdown();
+                }
             }
         }
 
@@ -223,6 +232,10 @@ namespace RaceTracker.Models
             {
                 this.year = value;
                 this.OnPropertyChanged("Year");
+                if (!string.IsNullOrEmpty(this.Month))
+                {
+                    this.Month = this.Month;
+                }
             }
         }
 
@@ -241,6 +254,8 @@ namespace RaceTracker.Models
             set
             {
                 this.OnPropertyChanged("DailyPotValue");
+                this.TotalWinPercentage = this.TotalWinPercentage;
+                this.PriceCutoffPercentage = this.PriceCutoffPercentage;
             }
         }
 

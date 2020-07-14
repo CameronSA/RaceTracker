@@ -30,7 +30,7 @@
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Aim for one win per day. Keep betting up to a fixed number of races (or fixed loss) or a win, whichever comes first" FontSize="16" FontWeight="Bold"/>
                     
-                    <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="3">
+                    <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
@@ -40,8 +40,9 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="3*"/>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="*"/>
                             <RowDefinition Height="2*"/>
+                            <RowDefinition Height="3*"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Text="Parameters:" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold"/>
@@ -142,40 +143,39 @@
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
-                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Month: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Path=Model.Months}" SelectedItem="{Binding Path=Model.Month}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Year: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Model.Year}" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Year: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Model.Year}" VerticalAlignment="Center" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="1"/>
                             </Grid>
                         </Grid>
                         <Button Grid.Row="6" Content="Go" VerticalAlignment="Center" Margin="20 0 20 0" Command="{Binding Path=Command}" CommandParameter="btStrategy1Go"/>
-                    </Grid>
+                        <Grid Grid.Row="7" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Text="Daily/Monthly Breakdown:" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Day: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Path=Model.MonthlyDays}" SelectedItem="{Binding Path=Model.MonthlyDay}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Month: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Path=Model.Months}" SelectedItem="{Binding Path=Model.Month}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Grid>
+                    <WpfPlot Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Name="MonthlyPlotStrategy1"/>
+                    <WpfPlot Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="4" Grid.RowSpan="2" Name="AnnualPlotStrategy1"/>
+                    <Grid Grid.Column="5" Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="8*"/>
+                            <RowDefinition Height="10*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Time" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Bet" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Odds" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Result" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Winnings" FontWeight="Bold"/>
-                        
-                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Path=DisplayTime}" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Path=DisplayBet}" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Path=DisplayOdds}" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Path=DisplayResult}" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Path=DisplayWinnings}" FontWeight="Bold"/>
+                        <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy1DailyBreakdownTitle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy1DailyBreakdown}"/>
                     </Grid>
                 </Grid>
             </TabItem>
