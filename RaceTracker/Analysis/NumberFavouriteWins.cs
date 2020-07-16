@@ -77,7 +77,7 @@ namespace RaceTracker.Analysis
             this.RelevantColumns = relevantColumns;
         }
 
-        public void CalculateNumberFavouriteWinsVsNumberRaces(int position)
+        public void CalculateNumberFavouriteWinsVsNumberRaces(int position, int minNumberRaces, int maxNumberRaces)
         {
             var raceDayData = new Dictionary<DateTime, Dictionary<DateTime, bool>>(); // key: date, value: time, favourite won
             foreach (var row in this.RelevantColumns)
@@ -113,8 +113,8 @@ namespace RaceTracker.Analysis
                 }
             }
 
-            var dataToPlot = new Dictionary<double, Dictionary<double, double>>(); //Key: number races Value: number favourite wins (% of number races), count
-            foreach (var raceDay in raceDayData)
+            var numberRacesVsPercentageFavouriteWins = new Dictionary<double, List<double>>(); //Key: number races Value: number favourite wins (% of number races)
+            foreach(var raceDay in raceDayData)
             {
                 double numberRaces = raceDay.Value.Count;
                 double numberFavouriteWins = 0;
@@ -126,40 +126,76 @@ namespace RaceTracker.Analysis
                     }
                 }
 
-                numberFavouriteWins = 100 * numberFavouriteWins / numberRaces;
-                if(dataToPlot.ContainsKey(numberRaces))
+                double percentageFavouriteWins = 100 * numberFavouriteWins / numberRaces;
+                if(numberRacesVsPercentageFavouriteWins.ContainsKey(numberRaces))
                 {
-                    if (dataToPlot[numberRaces].ContainsKey(numberFavouriteWins))
-                    {
-                        dataToPlot[numberRaces][numberFavouriteWins] += 1;
-                    }
-                    else
-                    {
-                        dataToPlot[numberRaces].Add(numberFavouriteWins, 1);
-                    }
+                    numberRacesVsPercentageFavouriteWins[numberRaces].Add(percentageFavouriteWins);
                 }
                 else
                 {
-                    dataToPlot.Add(numberRaces, new Dictionary<double, double> { { numberFavouriteWins, 1 } });
+                    numberRacesVsPercentageFavouriteWins.Add(numberRaces, new List<double> { percentageFavouriteWins });
                 }
             }
 
-            bool reset = true;
-            foreach(var dataSeries in dataToPlot)
+            var dataToPlot = new List<double>();
+            foreach (var numberRaces in numberRacesVsPercentageFavouriteWins)
             {
-                string seriesName = "Number Races: " + dataSeries.Key;
-                var numberWins = new List<double>();
-                var counts = new List<double>();
-                foreach(var item in dataSeries.Value)
+                foreach (var percentage in numberRaces.Value)
                 {
-                    numberWins.Add(item.Key);
-                    counts.Add(item.Value);
+                    dataToPlot.Add(percentage);
                 }
-
-                string extraLabel = this.ViewModel.Model.UpToAndIncludingPosition ? " or Less" : string.Empty;
-                this.Plotting.PlotScatter(this.ViewModel.View.NumberFavouriteWinsProbabilityPlot, numberWins, counts, reset, "Number of Favourites Finishing in Position " + position + extraLabel + " % of Number Races", "Count", new List<string>(), seriesName);
-                reset = false;
             }
+
+            string extraLabel = this.ViewModel.Model.UpToAndIncludingPosition ? " or Less" : string.Empty;
+            this.Plotting.PlotGaussian(this.ViewModel.View.NumberFavouriteWinsProbabilityPlot, dataToPlot, "Number of Favourites Finishing in Position " + position + extraLabel + " (% of Number Races)", "Count", "Number Races: " + minNumberRaces + " - " + maxNumberRaces, "%", this.ViewModel.Model.ResetIndividual);
+
+            //var dataToPlot = new Dictionary<double, Dictionary<double, double>>(); //Key: number races Value: number favourite wins (% of number races), count
+            //foreach (var raceDay in raceDayData)
+            //{
+            //    double numberRaces = raceDay.Value.Count;
+            //    double numberFavouriteWins = 0;
+            //    foreach (var race in raceDay.Value)
+            //    {
+            //        if (race.Value)
+            //        {
+            //            numberFavouriteWins++;
+            //        }
+            //    }
+
+            //    numberFavouriteWins = 100 * numberFavouriteWins / numberRaces;
+            //    if(dataToPlot.ContainsKey(numberRaces))
+            //    {
+            //        if (dataToPlot[numberRaces].ContainsKey(numberFavouriteWins))
+            //        {
+            //            dataToPlot[numberRaces][numberFavouriteWins] += 1;
+            //        }
+            //        else
+            //        {
+            //            dataToPlot[numberRaces].Add(numberFavouriteWins, 1);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        dataToPlot.Add(numberRaces, new Dictionary<double, double> { { numberFavouriteWins, 1 } });
+            //    }
+            //}
+
+            //bool reset = true;
+            //foreach(var dataSeries in dataToPlot)
+            //{
+            //    string seriesName = "Number Races: " + dataSeries.Key;
+            //    var numberWins = new List<double>();
+            //    var counts = new List<double>();
+            //    foreach(var item in dataSeries.Value)
+            //    {
+            //        numberWins.Add(item.Key);
+            //        counts.Add(item.Value);
+            //    }
+
+            //    string extraLabel = this.ViewModel.Model.UpToAndIncludingPosition ? " or Less" : string.Empty;
+            //    this.Plotting.PlotScatter(this.ViewModel.View.NumberFavouriteWinsProbabilityPlot, numberWins, counts, reset, "Number of Favourites Finishing in Position " + position + extraLabel + " % of Number Races", "Count", new List<string>(), seriesName);
+            //    reset = false;
+            //}
         }
 
         private Plotting Plotting { get; }

@@ -349,5 +349,38 @@ namespace RaceTracker.Analysis
 
             plot.Render();
         }
+
+        public void PlotGaussian(WpfPlot plot, IEnumerable<double> values, string xLabel, string yLabel, string seriesName, string seriesUnit, bool reset)
+        {
+            if(reset)
+            {
+                plot.Reset();
+            }
+
+            if (values.ToArray().Length < 1)
+            {
+                return;
+            }
+
+            var uniqueValues = new HashSet<double>();
+            foreach(var value in values)
+            {
+                uniqueValues.Add(value);
+            }
+
+            double minValue = uniqueValues.Min();
+            double maxValue = uniqueValues.Max();
+
+            var hist = new ScottPlot.Statistics.Histogram(values.ToArray(), minValue - (0.1 * minValue), maxValue + (0.1 * maxValue));
+            double barWidth = hist.binSize * 1.2;
+            seriesName += "\n" + Math.Round(hist.mean, 2) + " +/- " + Math.Round(hist.stdev, 2) + " " + seriesUnit;
+
+            plot.plt.PlotBar(hist.bins, hist.countsFrac, barWidth: barWidth, outlineWidth: 0);
+            plot.plt.PlotScatter(hist.bins, hist.countsFracCurve, markerSize: 0, lineWidth: 2, color: Color.Black, label: seriesName);
+            plot.plt.YLabel(yLabel);
+            plot.plt.XLabel(xLabel);
+            plot.plt.Legend(location: legendLocation.upperRight);
+            plot.Render();
+        }
     }
 }

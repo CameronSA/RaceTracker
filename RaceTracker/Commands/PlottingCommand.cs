@@ -73,7 +73,7 @@ namespace RaceTracker.Commands
                     break;
                 case "btNumberFavouriteWinsGo":
                     var numberFavourites = new NumberFavouriteWins(this.ViewModel);
-                    numberFavourites.CalculateNumberFavouriteWinsVsNumberRaces(1);
+                    numberFavourites.CalculateNumberFavouriteWinsVsNumberRaces(1, 20, 40);
                     break;
             }
         }    
