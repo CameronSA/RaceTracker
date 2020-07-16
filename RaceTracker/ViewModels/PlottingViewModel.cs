@@ -33,7 +33,9 @@ namespace RaceTracker.ViewModels
                 IndividualNumberRacecoursesMax = "10",
                 MinOdds = "0",
                 MaxOdds = "20",
-                NumberBins = "100"
+                NumberBins = "100",
+                NumberRacesMin = "10",
+                NumberRacesMax = "40"
             };
 
             if (this.Model.DataHeaders.Count > 0)

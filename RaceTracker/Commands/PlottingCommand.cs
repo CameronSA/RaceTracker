@@ -1,6 +1,8 @@
 ﻿using RaceTracker.Analysis;
+using RaceTracker.LogicHelpers;
 using RaceTracker.ViewModels;
 using System;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RaceTracker.Commands
@@ -72,8 +74,17 @@ namespace RaceTracker.Commands
                     oddsProbability.PlotOddsProbabilityProfile();
                     break;
                 case "btNumberFavouriteWinsGo":
-                    var numberFavourites = new NumberFavouriteWins(this.ViewModel);
-                    numberFavourites.CalculateNumberFavouriteWinsVsNumberRaces(1, 20, 40);
+
+                    if (int.TryParse(this.ViewModel.Model.Position, out int position) && int.TryParse(this.ViewModel.Model.NumberRacesMin, out int numberRacesMin) && int.TryParse(this.ViewModel.Model.NumberRacesMax, out int numberRacesMax) && position > 0 && numberRacesMin > 0 && numberRacesMax >= numberRacesMin)
+                    {
+                        var numberFavourites = new NumberFavouriteWins(this.ViewModel);
+                        numberFavourites.CalculateNumberFavouriteWinsVsNumberRaces(position, numberRacesMin, numberRacesMax);
+                    }
+                    else
+                    {
+                        MessageBox.Show("ERROR: Input error", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+
                     break;
             }
         }    

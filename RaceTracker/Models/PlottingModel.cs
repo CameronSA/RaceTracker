@@ -27,6 +27,34 @@ namespace RaceTracker.Models
         private string minOdds;
         private string maxOdds;
         private string numberBins;
+        private string numberRacesMin;
+        private string numberRacesMax;
+
+        public string NumberRacesMin
+        {
+            get
+            {
+                return this.numberRacesMin;
+            }
+            set
+            {
+                this.numberRacesMin = value;
+                this.OnPropertyChanged("NumberRacesMin");                
+            }
+        }
+
+        public string NumberRacesMax
+        {
+            get
+            {
+                return this.numberRacesMax;
+            }
+            set
+            {
+                this.numberRacesMax = value;
+                this.OnPropertyChanged("NumberRacesMax");
+            }
+        }
 
         public string NumberBins
         {
