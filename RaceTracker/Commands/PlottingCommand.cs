@@ -74,11 +74,11 @@ namespace RaceTracker.Commands
                     oddsProbability.PlotOddsProbabilityProfile();
                     break;
                 case "btNumberFavouriteWinsGo":
-
-                    if (int.TryParse(this.ViewModel.Model.Position, out int position) && int.TryParse(this.ViewModel.Model.NumberRacesMin, out int numberRacesMin) && int.TryParse(this.ViewModel.Model.NumberRacesMax, out int numberRacesMax) && position > 0 && numberRacesMin > 0 && numberRacesMax >= numberRacesMin)
+                    if (int.TryParse(this.ViewModel.Model.Position, out int position) && int.TryParse(this.ViewModel.Model.NumberRacesMin, out int numberRacesMin) && int.TryParse(this.ViewModel.Model.NumberRacesMax, out int numberRacesMax) && position > 0 && numberRacesMin > 0 && numberRacesMax >= numberRacesMin && double.TryParse(this.ViewModel.Model.MinOdds, out double minOdds) && double.TryParse(this.ViewModel.Model.MaxOdds, out double maxOdds))
                     {
                         var numberFavourites = new NumberFavouriteWins(this.ViewModel);
                         numberFavourites.CalculateNumberFavouriteWinsVsNumberRaces(position, numberRacesMin, numberRacesMax);
+                        numberFavourites.CalculateNumberFavouriteWinsVsNumberRacesFiltered(position, minOdds, maxOdds);
                     }
                     else
                     {

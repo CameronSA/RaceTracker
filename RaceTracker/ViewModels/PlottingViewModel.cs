@@ -20,6 +20,8 @@ namespace RaceTracker.ViewModels
 
         public PlottingViewModel(PlottingView view)
         {
+            var raceTypes = this.GetRaceTypes();
+
             this.Model = new PlottingModel()
             {
                 DataFields = Data.ProcessedRaceData,
@@ -34,8 +36,10 @@ namespace RaceTracker.ViewModels
                 MinOdds = "0",
                 MaxOdds = "20",
                 NumberBins = "100",
-                NumberRacesMin = "10",
-                NumberRacesMax = "40"
+                NumberRacesMin = "1",
+                NumberRacesMax = "100",
+                RaceTypes = raceTypes,
+                RaceType = raceTypes[0],
             };
 
             if (this.Model.DataHeaders.Count > 0)
@@ -95,6 +99,29 @@ namespace RaceTracker.ViewModels
                     }
                 }
             }
+        }
+
+        private List<string> GetRaceTypes()
+        {
+            var raceTypes = new HashSet<string>();
+            foreach (var column in Data.ProcessedRaceData)
+            {
+                if (column.Key.ToLower() == "race type")
+                {
+                    foreach (var item in column.Value.Data)
+                    {
+                        raceTypes.Add((string)item);
+                    }
+                }
+            }
+
+            var returnValue = new List<string> { "All" };
+            foreach (var raceType in raceTypes)
+            {
+                returnValue.Add(raceType);
+            }
+
+            return returnValue;
         }
 
         private void NumberRaceCoursesByDate()

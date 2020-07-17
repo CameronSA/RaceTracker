@@ -376,7 +376,7 @@ namespace RaceTracker.Analysis
             seriesName += "\n" + Math.Round(hist.mean, 2) + " +/- " + Math.Round(hist.stdev, 2) + " " + seriesUnit;
 
             plot.plt.PlotBar(hist.bins, hist.countsFrac, barWidth: barWidth, outlineWidth: 0);
-            plot.plt.PlotScatter(hist.bins, hist.countsFracCurve, markerSize: 0, lineWidth: 2, color: Color.Black, label: seriesName);
+            plot.plt.PlotScatter(hist.bins, hist.countsFracCurve, markerSize: 0, lineWidth: 2, label: seriesName);
             plot.plt.YLabel(yLabel);
             plot.plt.XLabel(xLabel);
             plot.plt.Legend(location: legendLocation.upperRight);

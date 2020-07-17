@@ -29,6 +29,20 @@ namespace RaceTracker.Models
         private string numberBins;
         private string numberRacesMin;
         private string numberRacesMax;
+        private string raceType;
+
+        public string RaceType
+        {
+            get
+            {
+                return this.raceType;
+            }
+            set
+            {
+                this.raceType = value;
+                this.OnPropertyChanged("RaceType");
+            }
+        }
 
         public string NumberRacesMin
         {
@@ -275,6 +289,8 @@ namespace RaceTracker.Models
                 this.OnPropertyChanged("DataFields");
             }
         }
+
+        public List<string> RaceTypes { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(object property)
