@@ -32,6 +32,7 @@ namespace RaceTracker.ViewModels
                 RaceType = raceTypes[0],
                 MonthlyDays = new List<string>(),
                 Year = DateTime.Today.Year.ToString(),
+                PercentageOfExpectedWins = "80"
             };
 
             this.Model.Months = months;
@@ -116,7 +117,11 @@ namespace RaceTracker.ViewModels
                 MessageBox.Show("ERROR: Year invalid!", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
-
+            else if(!double.TryParse(this.Model.PercentageOfExpectedWins, out _))
+            {
+                MessageBox.Show("ERROR: Percentage of Expected Wins invalid!", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
             return true;
         }
 

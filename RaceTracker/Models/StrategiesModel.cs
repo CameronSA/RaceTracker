@@ -27,10 +27,24 @@ namespace RaceTracker.Models
         private string strategy1DailyBreakdownTitle;
         private StrategiesViewModel viewModel;
         private DateTime date;
+        private string percentageOfExpectedWins;
 
         public StrategiesModel(StrategiesViewModel viewModel)
         {
             this.viewModel = viewModel;
+        }
+
+        public string PercentageOfExpectedWins
+        {
+            get
+            {
+                return this.percentageOfExpectedWins;
+            }
+            set
+            {
+                this.percentageOfExpectedWins = value;
+                this.OnPropertyChanged("PercentageOfExpectedWins");
+            }
         }
 
         public DateTime Date

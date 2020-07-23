@@ -160,21 +160,113 @@ namespace RaceTracker.Strategies
                 }
 
                 double averageOdds = odds.Average();
-                // calc mode race type
-
-                // Calculate winnings based on daily race outcomes
-                var bettingOutcome = this.CalculateDailyWinnings(day.Key, raceOutcomes);
-                if (returnValue.ContainsKey(day.Key))
+                var raceTypeCounts = new Dictionary<string, int>();
+                foreach (var raceType in raceTypes)
                 {
-                    MessageBox.Show("ERROR: Duplicate daily profits found for date '" + day.Key + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                    if (raceTypeCounts.ContainsKey(raceType))
+                    {
+                        raceTypeCounts[raceType]++;
+                    }
+                    else
+                    {
+                        raceTypeCounts.Add(raceType, 1);
+                    }
                 }
-                else
+
+                string modeRaceType = string.Empty;
+                int count = -1;
+                foreach (var raceType in raceTypeCounts)
                 {
-                    returnValue.Add(day.Key, bettingOutcome);
+                    if (raceType.Value > count)
+                    {
+                        modeRaceType = raceType.Key;
+                        count = raceType.Value;
+                    }
+                }
+
+                if ((modeRaceType == this.ViewModel.Model.RaceType.ToLower().Trim() || this.ViewModel.Model.RaceType.ToLower().Trim() == "all") && averageOdds >= minOdds && averageOdds <= maxOdds)
+                {
+                    // Calculate winnings based on daily race outcomes
+                    var bettingOutcome = this.CalculateDailyWinnings(day.Key, raceOutcomes, expectedNumberWins);
+                    if (returnValue.ContainsKey(day.Key))
+                    {
+                        MessageBox.Show("ERROR: Duplicate daily profits found for date '" + day.Key + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        returnValue.Add(day.Key, bettingOutcome);
+                    }
                 }
             }
 
             return returnValue;
+        }
+
+        // Input List: Tuple of race time, odds, bet on race, race won (for that day). Output Tuple: total bet and winnings
+        private Tuple<double, double> CalculateDailyWinnings(DateTime day, List<Tuple<DateTime, double, bool, bool>> raceOutcomes, double expectedNumberWins)
+        {
+            var raceOutcomesArray = raceOutcomes.OrderBy(x => x.Item1).ToArray();
+            double winPerRace = double.Parse(this.ViewModel.Model.TotalWinValue.Replace("£", string.Empty));
+            double dailyPot = double.Parse(this.ViewModel.Model.DailyPotValue.Replace("£", string.Empty));            
+            double lossCutoff = double.Parse(this.ViewModel.Model.PriceCutoffValue.Replace("£", string.Empty));
+            double percentageOfExpectedWins = Math.Abs(double.Parse(this.ViewModel.Model.PercentageOfExpectedWins));
+            var dailyBettingProfile = new List<Tuple<DateTime, double, double, bool, double>>(); // race time, bet, odds, result, net winnings for that race
+
+            double totalBet = 0;
+            double cumulativeBet = 0;
+            double grossWinnings = 0;
+            int numberWins = 0;
+            foreach(var race in raceOutcomes)
+            {
+                double odds = race.Item2;
+
+                // If the number of wins is greater than the given percentage of the total number of expected wins, or we have run out of money, stop betting
+                if (numberWins > percentageOfExpectedWins * expectedNumberWins / 100 || totalBet >= dailyPot)
+                {
+                    break;
+                }
+
+                numberWins = race.Item4 ? numberWins += 1 : numberWins;
+
+                // If we are betting on this race
+                if (race.Item3)
+                {
+                    double totalBetMinusLastBet = totalBet;
+                    double betRequirement = (winPerRace + cumulativeBet) / odds;
+                    // If the bet requirement is larger than the loss cutoff, reset to 0 and start again
+                    if (betRequirement > lossCutoff)
+                    {
+                        cumulativeBet = 0;
+                        betRequirement = winPerRace / odds;
+                    }
+
+                    // If the total bet + the bet requirement is greater than the daily pot, reduce the bet such that the difference is covered. If the resulting bet is 0 or less, stop betting
+                    if (totalBet + betRequirement > dailyPot)
+                    {
+                        if (dailyPot - (totalBet + betRequirement) < 0)
+                        {
+                            break;
+                        }
+
+                        cumulativeBet = dailyPot - (totalBet + betRequirement);
+                    }
+
+                    cumulativeBet += betRequirement;
+                    totalBet += betRequirement;
+
+                    double roundedBetRequirement = Math.Round(betRequirement, 2);
+
+                    // If we won
+                    if(race.Item4)
+                    {
+                        grossWinnings += betRequirement * odds;
+                    }
+                    else
+                    {
+                        dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(race.Item1, totalBet, odds, false, 0));
+                    }
+                }
+            }
         }
     }
 }

@@ -218,6 +218,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>                                
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0" Grid.Column="1">
@@ -258,6 +259,15 @@
                                 <TextBlock Grid.Column="0" Text="Loss Cutoff (% of Pot): " VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 <TextBox Grid.Column="1" Text="{Binding Path=Model.PriceCutoffPercentage}" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
                                 <TextBlock Grid.Column="2" Text="{Binding Path=Model.PriceCutoffValue}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gray" />
+                            </Grid>
+                            <Grid Grid.Row="4" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="% Of Expected Wins: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Path=Model.PercentageOfExpectedWins}" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
                             </Grid>
                         </Grid>
                         <TextBlock Grid.Row="2" Text="Filters:" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold"/>
