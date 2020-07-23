@@ -192,13 +192,126 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="8*"/>
-                        <RowDefinition Height="8*"/>
-                        <RowDefinition Height="8*"/>
-                        <RowDefinition Height="8*"/>
+                        <RowDefinition Height="4*"/>
+                        <RowDefinition Height="4*"/>
+                        <RowDefinition Height="4*"/>
+                        <RowDefinition Height="4*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Aim for a win on every race. Keep betting up to a fixed number of races (or fixed loss), or until the quota for that day has been reached, whichever comes first" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="7" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Aim for a win on every race. Keep betting until a percentage of the number of expected wins for that day has been reached. If the loss cutoff is reached, reset to 0 and continue until the daily pot is gone or the number of desired wins has been reached" FontSize="16" FontWeight="Bold" TextWrapping="Wrap"/>
+                    <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="8*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="3*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Parameters:" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold"/>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>                                
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Bank (£): " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Path=Model.Bank}" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
+                            </Grid>
+                            <Grid Grid.Row="1" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Daily Pot (% of Bank): " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Path=Model.DailyPotPercentage}" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Path=Model.DailyPotValue}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gray" />
+                            </Grid>
+                            <Grid Grid.Row="2" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text=" Win/Race (£) (% of Pot): " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Path=Model.TotalWinPercentage}" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Path=Model.TotalWinValue}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gray" />
+                            </Grid>
+                            <Grid Grid.Row="3" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="14*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Loss Cutoff (% of Pot): " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Path=Model.PriceCutoffPercentage}" VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Path=Model.PriceCutoffValue}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gray" />
+                            </Grid>
+                        </Grid>
+                        <TextBlock Grid.Row="2" Text="Filters:" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold"/>
+                        <Grid Grid.Row="3">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Av Odds of Fav: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Path=Model.MinOdds}" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
+                                <TextBlock Grid.Column="2" Text="-" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBox Grid.Column="3" Text="{Binding Path=Model.MaxOdds}" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1"/>
+                            </Grid>
+                            <Grid Grid.Row="1" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Mode Race Type: " VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{Binding Path=Model.RaceTypes}" SelectedItem="{Binding Path=Model.RaceType}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Grid>                        
+                        <Button Grid.Row="4" Content="Go" VerticalAlignment="Center" Margin="20 0 20 0" Command="{Binding Path=Command}" CommandParameter="btStrategy2Go"/>
+                        <Grid Grid.Row="7" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Daily/Monthly Breakdown:" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold"/>
+                            <DatePicker Grid.Row="1" Grid.Column="0" SelectedDate="{Binding Path=Model.Date}"/>
+                        </Grid>
+                    </Grid>
+                    <WpfPlot Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Name="MonthlyPlotStrategy2"/>
+                    <WpfPlot Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="4" Grid.RowSpan="2" Name="AnnualPlotStrategy2"/>
+                    <Grid Grid.Column="5" Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="10*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy1DailyBreakdownTitle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy1DailyBreakdown}"/>
+                    </Grid>
                 </Grid>
             </TabItem>
         </TabControl>

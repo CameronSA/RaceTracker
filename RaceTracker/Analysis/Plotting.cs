@@ -350,7 +350,8 @@ namespace RaceTracker.Analysis
             plot.Render();
         }
 
-        public void PlotGaussian(WpfPlot plot, IEnumerable<double> values, string xLabel, string yLabel, string seriesName, string seriesUnit, bool reset)
+        // Returns average value
+        public double PlotGaussian(WpfPlot plot, IEnumerable<double> values, string xLabel, string yLabel, string seriesName, string seriesUnit, bool reset)
         {
             if(reset)
             {
@@ -359,7 +360,7 @@ namespace RaceTracker.Analysis
 
             if (values.ToArray().Length < 1)
             {
-                return;
+                return -1;
             }
 
             var uniqueValues = new HashSet<double>();
@@ -381,6 +382,8 @@ namespace RaceTracker.Analysis
             plot.plt.XLabel(xLabel);
             plot.plt.Legend(location: legendLocation.upperRight);
             plot.Render();
+
+            return hist.mean;
         }
     }
 }

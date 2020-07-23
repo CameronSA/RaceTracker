@@ -78,7 +78,7 @@ namespace RaceTracker.Analysis
             this.RelevantColumns = relevantColumns;
         }
 
-        public void CalculateNumberFavouriteWinsVsNumberRacesFiltered(int position, double minOdds, double maxOdds)
+        public double CalculateNumberFavouriteWinsVsNumberRacesFiltered(int position, double minOdds, double maxOdds)
         {
             var raceDayData = new Dictionary<DateTime, Dictionary<DateTime, Tuple<double, string, bool>>>(); // key: date, value: time, odds of favourite, race type, favourite won
             foreach (var row in this.RelevantColumns)
@@ -159,7 +159,7 @@ namespace RaceTracker.Analysis
             }
 
             string extraLabel = this.ViewModel.Model.UpToAndIncludingPosition ? " or Less" : string.Empty;
-            this.Plotting.PlotGaussian(this.ViewModel.View.NumberFavouriteWinsProbabilityFiltersPlot, dataToPlot, "Number of Favourites Finishing in Position " + position + extraLabel + " (% of Number Races)", "Count", "Average Odds: " + minOdds + " - " + maxOdds, "%", this.ViewModel.Model.ResetIndividual);
+            return this.Plotting.PlotGaussian(this.ViewModel.View.NumberFavouriteWinsProbabilityFiltersPlot, dataToPlot, "Number of Favourites Finishing in Position " + position + extraLabel + " (% of Number Races)", "Count", "Average Odds: " + minOdds + " - " + maxOdds, "%", this.ViewModel.Model.ResetIndividual);
         }
 
         public void CalculateNumberFavouriteWinsVsNumberRaces(int position, int minNumberRaces, int maxNumberRaces)

@@ -26,10 +26,24 @@ namespace RaceTracker.Models
         private string strategy1DailyBreakdown;
         private string strategy1DailyBreakdownTitle;
         private StrategiesViewModel viewModel;
+        private DateTime date;
 
         public StrategiesModel(StrategiesViewModel viewModel)
         {
             this.viewModel = viewModel;
+        }
+
+        public DateTime Date
+        {
+            get
+            {
+                return this.date;
+            }
+            set
+            {
+                this.date = value;
+                this.OnPropertyChanged("Date");
+            }
         }
 
         public string Strategy1DailyBreakdownTitle

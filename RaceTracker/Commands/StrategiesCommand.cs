@@ -38,6 +38,9 @@ namespace RaceTracker.Commands
                 case "btStrategy1Go":
                     canExecute = true;
                     break;
+                case "btStrategy2Go":
+                    canExecute = true;
+                    break;
             }
 
             return canExecute;
@@ -49,6 +52,9 @@ namespace RaceTracker.Commands
             {
                 case "btStrategy1Go":
                     this.ExecuteStrategy1();       
+                    break;
+                case "btStrategy2Go":
+                    this.ExecuteStrategy2();
                     break;
             }
         }
@@ -65,6 +71,14 @@ namespace RaceTracker.Commands
 
                 this.CreateAnnualStrategy1Plot(formattedData);
                 this.ViewModel.DisplayDailyBreakdown();
+            }
+        }
+
+        private void ExecuteStrategy2()
+        {
+            if (this.ViewModel.VerifyInputs())
+            {
+
             }
         }
 

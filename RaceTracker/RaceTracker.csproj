@@ -112,6 +112,7 @@
     <Compile Include="Models\StrategiesModel.cs" />
     <Compile Include="Models\TimeResolutionFields.cs" />
     <Compile Include="Strategies\Strategy1.cs" />
+    <Compile Include="Strategies\Strategy2.cs" />
     <Compile Include="ViewModels\PlottingViewModel.cs" />
     <Compile Include="ViewModels\StrategiesViewModel.cs" />
     <Compile Include="Views\DataView.xaml.cs">
