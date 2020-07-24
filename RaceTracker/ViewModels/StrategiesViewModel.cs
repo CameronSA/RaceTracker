@@ -32,7 +32,8 @@ namespace RaceTracker.ViewModels
                 RaceType = raceTypes[0],
                 MonthlyDays = new List<string>(),
                 Year = DateTime.Today.Year.ToString(),
-                PercentageOfExpectedWins = "80"
+                PercentageOfExpectedWins = "80",
+                Date = new DateTime(2019, 01, 01)
             };
 
             this.Model.Months = months;
@@ -49,7 +50,7 @@ namespace RaceTracker.ViewModels
         public StrategiesCommand Command { get; }
         public int FixedYear { get; set; }
 
-        public void DisplayDailyBreakdown()
+        public void DisplayStrategy1DailyBreakdown()
         {
             if (FixedYear > 0)
             {
@@ -73,6 +74,40 @@ namespace RaceTracker.ViewModels
                     }
                 }
             }
+        }
+
+        public void DisplayStrategy2DailyBreakdown()
+        {
+            try
+            {
+                // Key: Day. Value: item1: race time, item2: bet, item3: odds, item4: result item5: gross winnings for that race, including initial stakes
+                Dictionary<DateTime, List<Tuple<DateTime, double, double, bool, double>>> reports = this.Command.Strategy2DailyReports;
+
+                foreach (var report in reports)
+                {
+                    if (report.Key.Year == this.Model.Date.Year && report.Key.Month == this.Model.Date.Month && report.Key.Day == this.Model.Date.Day)
+                    {
+                        double totalGrossWinnings = 0;
+                        double totalBet = 0;
+                        this.Model.Strategy2DailyBreakdownTitle = "Daily Breakdown for " + report.Key.Day + " " + UnitConversions.MonthName(report.Key.Month) + " " + report.Key.Year;
+                        this.Model.Strategy2DailyBreakdown = "Time\tBet (£)\tOdds\tResult\tGross Winnings (£)\n";
+                        this.Model.Strategy2DailyBreakdown += "================================\n";
+                        foreach (var line in report.Value)
+                        {
+                            totalGrossWinnings += line.Item5;
+                            totalBet += line.Item2;
+                            string win = line.Item4 ? "Win" : "Loss";
+                            this.Model.Strategy2DailyBreakdown += Formatting.EditStringLength(line.Item1.Hour.ToString(), 2) + ":" + Formatting.EditStringLength(line.Item1.Minute.ToString(), 2) + "\t" + Math.Round(line.Item2, 2) + "\t" + Math.Round(line.Item3, 2) + "\t" + win + "\t" + Math.Round(line.Item5, 2) + "\n";
+                        }
+
+                        double totalNetWinnings = totalGrossWinnings - totalBet;
+                        this.Model.Strategy2DailyBreakdown += "Total Bet: " + Math.Round(totalBet, 2) + "\nGross Winnings: " + Math.Round(totalGrossWinnings, 2) + "\nNet Winnings: " + Math.Round(totalNetWinnings, 2);
+                        break;
+                    }
+                }
+            }
+            catch
+            { }
         }
 
         public bool VerifyInputs()

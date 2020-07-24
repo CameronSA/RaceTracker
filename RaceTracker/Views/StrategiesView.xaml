@@ -314,13 +314,13 @@
                     </Grid>
                     <WpfPlot Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="4" Grid.RowSpan="2" Name="MonthlyPlotStrategy2"/>
                     <WpfPlot Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="4" Grid.RowSpan="2" Name="AnnualPlotStrategy2"/>
-                    <Grid Grid.Column="5" Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="2">
+                    <Grid Grid.Column="5" Grid.Row="1" Grid.RowSpan="4" Grid.ColumnSpan="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="10*"/>
+                            <RowDefinition Height="20*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy1DailyBreakdownTitle}" FontWeight="Bold"/>
-                        <TextBlock Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy1DailyBreakdown}"/>
+                        <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy2DailyBreakdownTitle}" FontWeight="Bold" FontSize="9"/>
+                        <TextBlock Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Text="{Binding Path=Model.Strategy2DailyBreakdown}" FontSize="9"/>
                     </Grid>
                 </Grid>
             </TabItem>

@@ -24,7 +24,9 @@ namespace RaceTracker.Models
         private List<string> monthlyDays;
         private string monthlyDay;
         private string strategy1DailyBreakdown;
+        private string strategy2DailyBreakdown;
         private string strategy1DailyBreakdownTitle;
+        private string strategy2DailyBreakdownTitle;
         private StrategiesViewModel viewModel;
         private DateTime date;
         private string percentageOfExpectedWins;
@@ -57,6 +59,7 @@ namespace RaceTracker.Models
             {
                 this.date = value;
                 this.OnPropertyChanged("Date");
+                this.viewModel.DisplayStrategy2DailyBreakdown();
             }
         }
 
@@ -85,6 +88,31 @@ namespace RaceTracker.Models
                 this.OnPropertyChanged("Strategy1DailyBreakdown");
             }
         }
+        public string Strategy2DailyBreakdownTitle
+        {
+            get
+            {
+                return this.strategy2DailyBreakdownTitle;
+            }
+            set
+            {
+                this.strategy2DailyBreakdownTitle = value;
+                this.OnPropertyChanged("Strategy2DailyBreakdownTitle");
+            }
+        }
+
+        public string Strategy2DailyBreakdown
+        {
+            get
+            {
+                return this.strategy2DailyBreakdown;
+            }
+            set
+            {
+                this.strategy2DailyBreakdown = value;
+                this.OnPropertyChanged("Strategy2DailyBreakdown");
+            }
+        }
 
         public List<string> MonthlyDays
         {
@@ -96,7 +124,7 @@ namespace RaceTracker.Models
             {
                 this.monthlyDays = value;
                 this.OnPropertyChanged("MonthlyDays");
-                this.viewModel.DisplayDailyBreakdown();
+                this.viewModel.DisplayStrategy1DailyBreakdown();
             }
         }
 
@@ -110,7 +138,7 @@ namespace RaceTracker.Models
             {
                 this.monthlyDay = value;
                 this.OnPropertyChanged("MonthlyDay");
-                this.viewModel.DisplayDailyBreakdown();
+                this.viewModel.DisplayStrategy1DailyBreakdown();
             }
         }
         
@@ -245,7 +273,7 @@ namespace RaceTracker.Models
                     }
 
                     this.MonthlyDays = days;
-                    this.viewModel.DisplayDailyBreakdown();
+                    this.viewModel.DisplayStrategy1DailyBreakdown();
                 }
             }
         }

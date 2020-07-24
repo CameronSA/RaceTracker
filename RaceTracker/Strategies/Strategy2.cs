@@ -105,7 +105,7 @@ namespace RaceTracker.Strategies
         private Dictionary<DateTime, Dictionary<DateTime, List<Tuple<string, int, string, double>>>> DailyRaceOutcomes; //Key: Date. Value: dictionary of race type, position, expectation and odds for each race time
 
         //Returns a tuple containing the total bet (item1) and the winnings (item2) for each day
-        public Dictionary<DateTime, Tuple<double, double>> CalculateDailyProfits()
+        public Dictionary<DateTime, Tuple<double, double>> CalculateDailyWinnings()
         {
             double minOdds = double.Parse(this.ViewModel.Model.MinOdds);
             double maxOdds = double.Parse(this.ViewModel.Model.MaxOdds);
@@ -202,7 +202,7 @@ namespace RaceTracker.Strategies
             return returnValue;
         }
 
-        // Input List: Tuple of race time, odds, bet on race, race won (for that day). Output Tuple: total bet and winnings
+        // Input List: Tuple of race time, odds, bet on race, race won (for that day). Output Tuple: total bet and gross winnings (including initial stakes for each bet)
         private Tuple<double, double> CalculateDailyWinnings(DateTime day, List<Tuple<DateTime, double, bool, bool>> raceOutcomes, double expectedNumberWins)
         {
             var raceOutcomesArray = raceOutcomes.OrderBy(x => x.Item1).ToArray();
@@ -231,7 +231,6 @@ namespace RaceTracker.Strategies
                 // If we are betting on this race
                 if (race.Item3)
                 {
-                    double totalBetMinusLastBet = totalBet;
                     double betRequirement = (winPerRace + cumulativeBet) / odds;
                     // If the bet requirement is larger than the loss cutoff, reset to 0 and start again
                     if (betRequirement > lossCutoff)
@@ -256,17 +255,34 @@ namespace RaceTracker.Strategies
 
                     double roundedBetRequirement = Math.Round(betRequirement, 2);
 
-                    // If we won
+                    // If we won, reset to 0 and continue
                     if(race.Item4)
                     {
-                        grossWinnings += betRequirement * odds;
+                        grossWinnings += (roundedBetRequirement * odds) + roundedBetRequirement;
+                        dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(race.Item1, cumulativeBet, odds, race.Item4, grossWinnings));
+                        cumulativeBet = 0;
                     }
                     else
                     {
-                        dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(race.Item1, totalBet, odds, false, 0));
+                        dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(race.Item1, cumulativeBet, odds, race.Item4, 0));
                     }
                 }
+                else
+                {
+                    dailyBettingProfile.Add(new Tuple<DateTime, double, double, bool, double>(race.Item1, 0, odds, race.Item4, 0));
+                }
             }
+
+            if (this.DailyReports.ContainsKey(day))
+            {
+                MessageBox.Show("ERROR: Duplicate daily reports found for date '" + day + "'", AppSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                this.DailyReports.Add(day, dailyBettingProfile);
+            }
+
+            return new Tuple<double, double>(totalBet, grossWinnings);
         }
     }
 }
